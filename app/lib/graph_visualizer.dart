@@ -29,6 +29,7 @@ class GraphVisualizer extends StatefulWidget {
 class _GraphVisualizerState extends State<GraphVisualizer>
     with SingleTickerProviderStateMixin {
   static const int _desiredFrameRate = 2;
+  Algorithm _algorithm = Algorithm.bfs;
 
   GraphMode _mode = GraphMode.grid;
   bool _paintEdges = true;
@@ -66,7 +67,9 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   }
 
   void _tick() {
-    final complete = _graph.dfsStep();
+    final complete = _algorithm == Algorithm.dfs
+        ? _graph.dfsStep(randomized: true)
+        : _graph.bfsStep(randomized: false);
     if (complete) {
       _paintEdges = false;
     }
@@ -114,6 +117,13 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   void _onModeChanged(GraphMode mode) {
     setState(() {
       _mode = mode;
+    });
+    _onReset();
+  }
+
+  void _onAlgorithmChanged(Algorithm algorithm) {
+    setState(() {
+      _algorithm = algorithm;
     });
     _onReset();
   }
@@ -269,6 +279,17 @@ class _GraphVisualizerState extends State<GraphVisualizer>
                     selectedItem: _mode,
                     items: GraphMode.values,
                     onChanged: _onModeChanged,
+                    labelBuilder: (m) => m.label,
+                  ),
+                ),
+              ),
+              Flexible(
+                child: SizedBox(
+                  width: 250,
+                  child: CustomRadioGroup<Algorithm>(
+                    selectedItem: _algorithm,
+                    items: Algorithm.values,
+                    onChanged: _onAlgorithmChanged,
                     labelBuilder: (m) => m.label,
                   ),
                 ),
