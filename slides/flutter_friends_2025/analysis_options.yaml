@@ -1,1 +1,9 @@
 include: package:flutter_lints/flutter.yaml
+
+formatter:
+  trailing_commas: preserve
+
+linter:
+  rules:
+    - require_trailing_commas: true
+    - file_names: false
