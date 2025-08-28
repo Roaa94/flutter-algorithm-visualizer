@@ -11,16 +11,10 @@ import 'node.dart';
 class GraphVisualizer extends StatefulWidget {
   const GraphVisualizer({
     required this.size,
-    this.nodesCount = 10,
-    this.nodeRadius = 20,
-    this.cellSizeFraction = 0.18,
     super.key,
   });
 
   final Size size;
-  final int nodesCount;
-  final double nodeRadius;
-  final double cellSizeFraction;
 
   @override
   State<GraphVisualizer> createState() => _GraphVisualizerState();
@@ -28,8 +22,11 @@ class GraphVisualizer extends StatefulWidget {
 
 class _GraphVisualizerState extends State<GraphVisualizer>
     with SingleTickerProviderStateMixin {
-  static const int _desiredFrameRate = 2;
-  Algorithm _algorithm = Algorithm.bfs;
+  int _desiredFrameRate = 2;
+  Algorithm _algorithm = Algorithm.dfs;
+  double _cellSizeFraction = 0.18;
+  int _nodesCount = 10;
+  double _nodesRadius = 20;
 
   GraphMode _mode = GraphMode.grid;
   bool _paintEdges = true;
@@ -38,7 +35,8 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   late final Ticker _ticker;
   Duration _elapsed = Duration.zero;
   Duration? _lastElapsed;
-  final Duration _desiredFrameTime = Duration(
+
+  Duration get _desiredFrameTime => Duration(
     milliseconds: (1000 / _desiredFrameRate).floor(),
   );
 
@@ -78,8 +76,8 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   void _initGraph() {
     _graph = Graph(
       size: widget.size,
-      nodesCount: widget.nodesCount,
-      cellSizeFraction: widget.cellSizeFraction,
+      nodesCount: _nodesCount,
+      cellSizeFraction: _cellSizeFraction,
       hasDiagonalEdges: _hasDiagonalEdges,
       startingNodeIndex: _startingNodeIndex,
       mode: _mode,
@@ -114,6 +112,12 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     setState(() {});
   }
 
+  void _onFrameRateChanged(int value) {
+    setState(() {
+      _desiredFrameRate = value;
+    });
+  }
+
   void _onModeChanged(GraphMode mode) {
     setState(() {
       _mode = mode;
@@ -124,6 +128,20 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   void _onAlgorithmChanged(Algorithm algorithm) {
     setState(() {
       _algorithm = algorithm;
+    });
+    _onReset();
+  }
+
+  void _onCellSizeChanged(double value) {
+    setState(() {
+      _cellSizeFraction = value;
+    });
+    _onReset();
+  }
+
+  void _onNodesCountChanged(int value) {
+    setState(() {
+      _nodesCount = value;
     });
     _onReset();
   }
@@ -142,7 +160,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   void _onHover(PointerHoverEvent event) {
     final offset = event.localPosition;
     final hoveredNodeIndex = _graph.nodes.indexWhere(
-      (node) => isWithinRadius(node.offset, offset, widget.nodeRadius),
+      (node) => isWithinRadius(node.offset, offset, _nodesRadius),
     );
     if (hoveredNodeIndex < 0 && _hoveredNodeIndex == hoveredNodeIndex) return;
     setState(() {
@@ -168,7 +186,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   void _onPanDown(DragDownDetails details) {
     final offset = details.localPosition;
     final selectedNodeIndex = _graph.nodes.indexWhere(
-      (node) => isWithinRadius(node.offset, offset, widget.nodeRadius),
+      (node) => isWithinRadius(node.offset, offset, _nodesRadius),
     );
     if (selectedNodeIndex < 0) return;
 
@@ -226,7 +244,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
                 child: CustomPaint(
                   painter: GraphPainter(
                     graph: _graph,
-                    nodeRadius: widget.nodeRadius,
+                    nodeRadius: _nodesRadius,
                     paintEdges: _paintEdges,
                     hoverOffset: _hoverOffset,
                     hoveredNodeIndex: _hoveredNodeIndex,
@@ -296,8 +314,84 @@ class _GraphVisualizerState extends State<GraphVisualizer>
               ),
             ],
           ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 30,
+            children: [
+              if (_mode == GraphMode.grid)
+                SliderTile(
+                  label: 'Grid Cell Size',
+                  value: _cellSizeFraction,
+                  min: 0.05,
+                  max: 0.5,
+                  onChanged: _onCellSizeChanged,
+                ),
+              if (_mode != GraphMode.grid)
+                SliderTile(
+                  label: 'Nodes count',
+                  value: _nodesCount.toDouble(),
+                  min: 2,
+                  max: 50,
+                  onChanged: (value) => _onNodesCountChanged(value.toInt()),
+                ),
+              SliderTile(
+                label: 'Nodes Radius',
+                value: _nodesRadius,
+                min: 1,
+                max: 40,
+                onChanged: (value) {
+                  setState(() {
+                    _nodesRadius = value;
+                  });
+                },
+              ),
+              SliderTile(
+                label: 'Frames per second',
+                value: _desiredFrameRate,
+                min: 1,
+                max: 60,
+                onChanged: (value) => _onFrameRateChanged(value.toInt()),
+              ),
+            ],
+          ),
         ],
       ),
+    );
+  }
+}
+
+class SliderTile extends StatelessWidget {
+  const SliderTile({
+    super.key,
+    required this.label,
+    this.value = 0,
+    this.min = 0,
+    required this.max,
+    required this.onChanged,
+  });
+
+  final String label;
+  final num value;
+  final double min;
+  final double max;
+
+  final ValueChanged<double> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      spacing: 10,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label),
+        Slider(
+          padding: EdgeInsets.zero,
+          value: value.toDouble(),
+          min: min,
+          max: max,
+          onChanged: onChanged,
+        ),
+      ],
     );
   }
 }

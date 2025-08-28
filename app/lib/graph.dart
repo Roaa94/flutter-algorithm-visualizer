@@ -63,7 +63,7 @@ class Graph {
     _generateEdges();
     _generateAdjacencyList();
     stack = [];
-    activeNodeIndex = startingNodeIndex ?? nodes.length ~/ 2;
+    activeNodeIndex = startingNodeIndex ?? 0;
   }
 
   void _generateNodes() {
@@ -77,7 +77,7 @@ class Graph {
       offsets = generateCircularOffsets(
         radius: size.shortestSide / 2,
         center: size.center(Offset.zero),
-        count: 10,
+        count: nodesCount,
       );
     } else {
       offsets = generateRandomPoints(

@@ -10,7 +10,6 @@ class PlaygroundPage extends StatelessWidget {
     return Scaffold(
       body: GraphVisualizer(
         size: MediaQuery.sizeOf(context) * 0.7,
-        nodesCount: 10,
       ),
     );
   }
