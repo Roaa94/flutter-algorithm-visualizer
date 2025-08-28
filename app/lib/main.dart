@@ -14,6 +14,7 @@ class MainApp extends StatelessWidget {
       themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark().copyWith(
+        colorScheme: ColorScheme.highContrastLight(),
         scaffoldBackgroundColor: Colors.black,
       ),
       home: PlaygroundPage(),
