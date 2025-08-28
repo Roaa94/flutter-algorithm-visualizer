@@ -172,33 +172,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     if (nodes.isEmpty) throw Exception('Nodes not generated!');
     edges = [];
     if (_mode == GraphMode.grid) {
-      // ---- Build grid edges (8-neighbor connectivity) ----
-      final cols = (widget.size.width / (widget.size.width * cellSizeFraction))
-          .floor();
-      final rows =
-          (widget.size.height / (widget.size.height * cellSizeFraction))
-              .floor();
-      // 8-neighborhood, but only the half that points "forward":
-      // rule: dr > 0 OR (dr == 0 && dc > 0)
-      const dirs = <(int dr, int dc)>[
-        (0, 1), // right
-        (1, 0), // down
-        (1, 1), // down-right
-        (-1, 1), // up-right
-      ];
-
-      for (int r = 0; r < rows; r++) {
-        for (int c = 0; c < cols; c++) {
-          final a = r * cols + c;
-          for (final (dr, dc) in dirs) {
-            final nr = r + dr, nc = c + dc;
-            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-              final b = nr * cols + nc;
-              edges.add([a, b]); // each edge added exactly once
-            }
-          }
-        }
-      }
+      edges = generateGridEdges(widget.size, cellSizeFraction);
     } else {
       edges = [
         for (int i = 0; i < nodes.length; i++)

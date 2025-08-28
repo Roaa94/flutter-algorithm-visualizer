@@ -142,3 +142,37 @@ void drawArrow(
 
   canvas.drawPath(path, paint);
 }
+
+List<List<int>> generateGridEdges(
+  Size size,
+  double cellSizeFraction, {
+  bool withDiagonals = true,
+}) {
+  final edges = <List<int>>[];
+  final cols = (size.width / (size.width * cellSizeFraction)).floor();
+  final rows = (size.height / (size.height * cellSizeFraction)).floor();
+  // 8-neighborhood, but only the half that points "forward":
+  // rule: dr > 0 OR (dr == 0 && dc > 0)
+  final dirs = <(int dr, int dc)>[
+    (0, 1), // right
+    (1, 0), // down
+    if (withDiagonals) ...[
+      (1, 1), // down-right
+      (-1, 1), // up-right
+    ],
+  ];
+
+  for (int r = 0; r < rows; r++) {
+    for (int c = 0; c < cols; c++) {
+      final a = r * cols + c;
+      for (final (dr, dc) in dirs) {
+        final nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+          final b = nr * cols + nc;
+          edges.add([a, b]); // each edge added exactly once
+        }
+      }
+    }
+  }
+  return edges;
+}
