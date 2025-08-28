@@ -2,9 +2,11 @@ import 'dart:math';
 
 import 'package:app/node.dart';
 import 'package:app/utils.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 const _isDebug = false;
+const nodeRadius = 20.0;
 
 class PlaygroundPage extends StatelessWidget {
   const PlaygroundPage({super.key});
@@ -48,8 +50,21 @@ class _GraphPainterState extends State<GraphPainter> {
   late List<Node> nodes;
   late Set<List<int>> edges;
   late List<List<int>> adjacencyList;
+  Offset? _hoverOffset;
 
   static final random = Random();
+
+  int get hoveredNodeIndex {
+    if (_hoverOffset == null) return -1;
+    return nodes.indexWhere(
+      (node) => isWithinRadius(node.offset, _hoverOffset!, nodeRadius),
+    );
+  }
+
+  List<int> get hoveredNodeNeighbors {
+    if (_hoverOffset == null || hoveredNodeIndex < 0) return [];
+    return adjacencyList[hoveredNodeIndex];
+  }
 
   void _generateGraph() {
     _generateNodes();
@@ -132,6 +147,35 @@ class _GraphPainterState extends State<GraphPainter> {
     });
   }
 
+  void _onEnter(_) {
+    //
+  }
+
+  void _onHover(PointerHoverEvent event) {
+    //
+    setState(() {
+      _hoverOffset = event.localPosition;
+    });
+  }
+
+  void _onExit(_) {
+    setState(() {
+      _hoverOffset = null;
+    });
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    //
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    //
+  }
+
+  void _onTap() {
+    //
+  }
+
   @override
   void initState() {
     super.initState();
@@ -140,11 +184,29 @@ class _GraphPainterState extends State<GraphPainter> {
 
   @override
   Widget build(BuildContext context) {
-    // _generateGraph();
-    return CustomPaint(
-      painter: PlaygroundPainter(
-        nodes: nodes,
-        edges: edges,
+    return MouseRegion(
+      onHover: _onHover,
+      onEnter: _onEnter,
+      onExit: _onExit,
+      child: GestureDetector(
+        onTap: _onTap,
+        onTapDown: _onTapDown,
+        onTapUp: _onTapUp,
+        behavior: HitTestBehavior.opaque,
+        child: ColoredBox(
+          color: Colors.red.withAlpha(50),
+          child: CustomPaint(
+            painter: PlaygroundPainter(
+              nodes: nodes,
+              edges: edges,
+              adjacencyList: adjacencyList,
+              hoverOffset: _hoverOffset,
+              hoveredNodeIndex: hoveredNodeIndex,
+              hoveredNodeNeighbors: hoveredNodeNeighbors,
+            ),
+            child: Container(),
+          ),
+        ),
       ),
     );
   }
@@ -154,23 +216,31 @@ class PlaygroundPainter extends CustomPainter {
   PlaygroundPainter({
     required this.nodes,
     required this.edges,
+    required this.adjacencyList,
+    this.hoverOffset,
+    this.hoveredNodeIndex = -1,
+    this.hoveredNodeNeighbors = const [],
   });
 
   final List<Node> nodes;
-  late Set<List<int>> edges;
-
-  static const nodeRadius = 20.0;
+  final Set<List<int>> edges;
+  final List<List<int>> adjacencyList;
+  final Offset? hoverOffset;
+  final int hoveredNodeIndex;
+  final List<int> hoveredNodeNeighbors;
 
   @override
   void paint(Canvas canvas, Size size) {
     for (final edge in edges) {
       final start = nodes[edge.first].offset;
       final end = nodes[edge.last].offset;
+      final isHovered = edge.contains(hoveredNodeIndex);
+
       canvas.drawLine(
         start,
         end,
         Paint()
-          ..color = Colors.grey
+          ..color = isHovered ? Colors.yellow : Colors.grey
           ..style = PaintingStyle.stroke
           ..strokeWidth = 4,
       );
@@ -190,7 +260,19 @@ class PlaygroundPainter extends CustomPainter {
     }
 
     for (final (index, node) in nodes.indexed) {
-      canvas.drawCircle(node.offset, nodeRadius, Paint()..color = Colors.white);
+      bool isHovered = hoveredNodeIndex == index;
+      bool isHoveredNeighbor = hoveredNodeNeighbors.contains(index);
+
+      canvas.drawCircle(
+        node.offset,
+        nodeRadius,
+        Paint()
+          ..color = isHoveredNeighbor
+              ? Colors.yellow
+              : isHovered
+              ? Colors.blue
+              : Colors.white,
+      );
       paintText(
         canvas,
         nodeRadius,
@@ -205,4 +287,16 @@ class PlaygroundPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return false;
   }
+
+  @override
+  bool? hitTest(Offset position) {
+    // Todo: consider
+    // bool hit = path.contains(position);
+    // return hit;
+    return true;
+  }
+}
+
+bool isWithinRadius(Offset origin, Offset target, double radius) {
+  return (target - origin).distance <= radius;
 }
