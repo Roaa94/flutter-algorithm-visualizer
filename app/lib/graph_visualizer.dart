@@ -28,7 +28,7 @@ class GraphVisualizer extends StatefulWidget {
 
 class _GraphVisualizerState extends State<GraphVisualizer>
     with SingleTickerProviderStateMixin {
-  static const int _desiredFrameRate = 2; // 1 frame per second
+  static const int _desiredFrameRate = 2;
 
   GraphMode _mode = GraphMode.grid;
   bool _paintEdges = true;

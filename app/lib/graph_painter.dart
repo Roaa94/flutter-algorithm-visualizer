@@ -34,7 +34,7 @@ class GraphPainter extends CustomPainter {
 
   final linePaint = Paint()
     ..style = PaintingStyle.stroke
-    ..strokeWidth = 4;
+    ..strokeWidth = 3;
 
   final nodePaint = Paint();
 
@@ -67,7 +67,7 @@ class GraphPainter extends CustomPainter {
           node.previousNode!.offset,
           node.offset,
           nodeRadius,
-          5,
+          nodeRadius * 0.2,
           linePaint..color = secondaryColor,
         );
       }
@@ -109,7 +109,7 @@ class GraphPainter extends CustomPainter {
         nodeRadius,
         offset: node.offset,
         text: index.toString(),
-        fontSize: nodeRadius * 0.8,
+        fontSize: nodeRadius * 0.5,
       );
     }
   }
