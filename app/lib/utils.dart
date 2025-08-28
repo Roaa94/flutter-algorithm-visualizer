@@ -69,7 +69,6 @@ void paintText(
   final textStyle = TextStyle(
     color: color,
     fontSize: fontSize,
-    fontWeight: FontWeight.bold,
   );
   final textSpan = TextSpan(text: text, style: textStyle);
   final textPainter = TextPainter(

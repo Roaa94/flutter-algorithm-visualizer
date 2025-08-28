@@ -41,7 +41,7 @@ class GraphPainter extends StatefulWidget {
   State<GraphPainter> createState() => _GraphPainterState();
 }
 
-const _isGrid = false;
+const _isGrid = true;
 const _isCircle = true;
 
 class _GraphPainterState extends State<GraphPainter> {
@@ -50,6 +50,12 @@ class _GraphPainterState extends State<GraphPainter> {
   late List<List<int>> adjacencyList;
 
   static final random = Random();
+
+  void _generateGraph() {
+    _generateNodes();
+    _generateEdges();
+    _generateAdjacencyList();
+  }
 
   void _generateNodes() {
     late List<Offset> offsets;
@@ -72,62 +78,69 @@ class _GraphPainterState extends State<GraphPainter> {
       );
     }
     nodes = offsets.map((offset) => Node(offset.dx, offset.dy)).toList();
+  }
+
+  void _generateEdges() {
+    if (nodes.isEmpty) throw Exception('Nodes not generated!');
     if (_isGrid) {
       // ---- Build grid edges (8-neighbor connectivity) ----
       final cols = (widget.size.width / (widget.size.width * 0.2)).floor();
       final rows = (widget.size.height / (widget.size.height * 0.2)).floor();
-
-      final neighborDirs = [
-        const Offset(1, 0), // right
-        const Offset(-1, 0), // left
-        const Offset(0, 1), // down
-        const Offset(0, -1), // up
-        // Diagonals
-        const Offset(1, 1), // down-right
-        const Offset(1, -1), // up-right
-        const Offset(-1, 1), // down-left
-        const Offset(-1, -1), // up-left
+      // 8-neighborhood, but only the half that points "forward":
+      // rule: dr > 0 OR (dr == 0 && dc > 0)
+      const dirs = <(int dr, int dc)>[
+        (0, 1), // right
+        (1, 0), // down
+        (1, 1), // down-right
+        (-1, 1), // up-right
       ];
 
-      final edgeSet = <List<int>>{};
+      final edgeList = <List<int>>[];
 
       for (int r = 0; r < rows; r++) {
         for (int c = 0; c < cols; c++) {
-          final index = r * cols + c;
-
-          for (final dir in neighborDirs) {
-            final nr = r + dir.dy.toInt();
-            final nc = c + dir.dx.toInt();
+          final a = r * cols + c;
+          for (final (dr, dc) in dirs) {
+            final nr = r + dr, nc = c + dc;
             if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
-              final neighborIndex = nr * cols + nc;
-              // store edge as [min, max] to avoid duplicates
-              edgeSet.add([index, neighborIndex]..sort());
+              final b = nr * cols + nc;
+              edgeList.add([a, b]); // each edge added exactly once
             }
           }
         }
       }
 
-      edges = edgeSet;
+      edges = edgeList.toSet();
     } else {
-      edges = <List<int>>{}.toSet();
-
-      for (int i = 0; i < nodes.length; i++) {
-        for (int j = i + 1; j < nodes.length; j++) {
-          edges.add([i, j]);
-        }
-      }
+      edges = {
+        for (int i = 0; i < nodes.length; i++)
+          for (int j = i + 1; j < nodes.length; j++) [i, j],
+      };
     }
+  }
+
+  void _generateAdjacencyList() {
+    if (edges.isEmpty) throw Exception('Edges not generated!');
+
+    adjacencyList = List.generate(nodes.length, (index) {
+      final currentEdges = edges.where((items) => items.contains(index));
+      return currentEdges
+          .map((edges) => edges.where((e) => e != index))
+          .expand((i) => i)
+          .toList()
+        ..sort();
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    _generateNodes();
+    _generateGraph();
   }
 
   @override
   Widget build(BuildContext context) {
-    // _generateNodes();
+    // _generateGraph();
     return CustomPaint(
       painter: PlaygroundPainter(
         nodes: nodes,
@@ -146,13 +159,13 @@ class PlaygroundPainter extends CustomPainter {
   final List<Node> nodes;
   late Set<List<int>> edges;
 
-  static const nodeRadius = 25.0;
+  static const nodeRadius = 20.0;
 
   @override
   void paint(Canvas canvas, Size size) {
     for (final edge in edges) {
-      final start = nodes[edge[0]].offset;
-      final end = nodes[edge[1]].offset;
+      final start = nodes[edge.first].offset;
+      final end = nodes[edge.last].offset;
       canvas.drawLine(
         start,
         end,
@@ -166,7 +179,7 @@ class PlaygroundPainter extends CustomPainter {
         paintText(
           canvas,
           1000,
-          text: '[${edge[0]}, ${edge[1]}]',
+          text: '[$start, $end]',
           offset: Offset(
             (start.dx + end.dx) / 2,
             (start.dy + end.dy) / 2,
