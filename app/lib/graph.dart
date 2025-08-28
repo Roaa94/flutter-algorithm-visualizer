@@ -36,6 +36,7 @@ class Graph {
     required this.nodesCount,
     this.cellSizeFraction = 0.18,
     this.hasDiagonalEdges = true,
+    this.startingNodeIndex,
     Random? random,
   }) : _random = random ?? Random() {
     _init();
@@ -44,6 +45,7 @@ class Graph {
   final GraphMode mode;
   final Size size;
   final int nodesCount;
+  final int? startingNodeIndex;
   final double cellSizeFraction;
   final bool hasDiagonalEdges;
 
@@ -60,8 +62,7 @@ class Graph {
     _generateEdges();
     _generateAdjacencyList();
     stack = [];
-    // Todo: allow custom starting node
-    activeNodeIndex = 0;
+    activeNodeIndex = startingNodeIndex ?? nodes.length ~/ 2;
   }
 
   void _generateNodes() {

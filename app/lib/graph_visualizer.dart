@@ -46,6 +46,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   Offset? _hoverOffset;
   int _selectedNodeIndex = -1;
   int _hoveredNodeIndex = -1;
+  int? _startingNodeIndex;
 
   List<int> get hoveredNodeNeighbors {
     if (_hoverOffset == null || _hoveredNodeIndex < 0) return [];
@@ -77,6 +78,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
       nodesCount: widget.nodesCount,
       cellSizeFraction: widget.cellSizeFraction,
       hasDiagonalEdges: _hasDiagonalEdges,
+      startingNodeIndex: _startingNodeIndex,
       mode: _mode,
     );
   }
@@ -104,6 +106,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     _elapsed = Duration.zero;
     _lastElapsed = null;
     _paintEdges = true;
+    _startingNodeIndex = null;
     _initGraph();
     setState(() {});
   }
@@ -158,9 +161,11 @@ class _GraphVisualizerState extends State<GraphVisualizer>
       (node) => isWithinRadius(node.offset, offset, widget.nodeRadius),
     );
     if (selectedNodeIndex < 0) return;
-    setState(() {
-      _selectedNodeIndex = selectedNodeIndex;
-    });
+
+    _startingNodeIndex = selectedNodeIndex;
+    _graph.activeNodeIndex = _startingNodeIndex!;
+    _selectedNodeIndex = selectedNodeIndex;
+    setState(() {});
   }
 
   void _onPanUpdate(DragUpdateDetails details) {
