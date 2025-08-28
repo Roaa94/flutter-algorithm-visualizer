@@ -41,11 +41,14 @@ class GraphPainter extends StatefulWidget {
   State<GraphPainter> createState() => _GraphPainterState();
 }
 
-const _isGrid = true;
+const _isGrid = false;
+const _isCircle = true;
 
 class _GraphPainterState extends State<GraphPainter> {
   late List<Node> nodes;
   late Set<List<int>> edges;
+  late List<List<int>> adjacencyList;
+
   static final random = Random();
 
   void _generateNodes() {
@@ -54,6 +57,12 @@ class _GraphPainterState extends State<GraphPainter> {
       offsets = generateGridPoints(
         canvasSize: widget.size,
         cellSize: widget.size * 0.2,
+      );
+    } else if (_isCircle) {
+      offsets = generateCircularOffsets(
+        radius: widget.size.shortestSide / 2,
+        center: widget.size.center(Offset.zero),
+        count: 10,
       );
     } else {
       offsets = generateRandomPoints(
@@ -100,11 +109,13 @@ class _GraphPainterState extends State<GraphPainter> {
 
       edges = edgeSet;
     } else {
-      edges = Set<List<int>>.from(
-        List<List<List<int>>>.generate(nodes.length, (sourceIndex) {
-          return List.generate(2, (targetIndex) => [sourceIndex, targetIndex]);
-        }).expand((i) => i),
-      );
+      edges = <List<int>>{}.toSet();
+
+      for (int i = 0; i < nodes.length; i++) {
+        for (int j = i + 1; j < nodes.length; j++) {
+          edges.add([i, j]);
+        }
+      }
     }
   }
 
@@ -135,7 +146,7 @@ class PlaygroundPainter extends CustomPainter {
   final List<Node> nodes;
   late Set<List<int>> edges;
 
-  static const nodeRadius = 20.0;
+  static const nodeRadius = 25.0;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -150,6 +161,7 @@ class PlaygroundPainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeWidth = 4,
       );
+
       if (_isDebug) {
         paintText(
           canvas,
@@ -163,6 +175,7 @@ class PlaygroundPainter extends CustomPainter {
         );
       }
     }
+
     for (final (index, node) in nodes.indexed) {
       canvas.drawCircle(node.offset, nodeRadius, Paint()..color = Colors.white);
       paintText(
