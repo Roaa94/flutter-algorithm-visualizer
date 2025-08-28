@@ -40,9 +40,8 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     milliseconds: (1000 / _desiredFrameRate).floor(),
   );
 
-  late List<Node> nodes;
-  late List<List<int>> edges;
-  late List<List<int>> adjacencyList;
+  late Graph _graph;
+
   Offset? _hoverOffset;
   List<int> _stack = [];
   int _selectedNodeIndex = -1;
@@ -55,7 +54,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
 
   List<int> get hoveredNodeNeighbors {
     if (_hoverOffset == null || _hoveredNodeIndex < 0) return [];
-    return adjacencyList[_hoveredNodeIndex];
+    return _graph.adjacencyList[_hoveredNodeIndex];
   }
 
   void _onTick(Duration elapsed) {
@@ -72,15 +71,15 @@ class _GraphVisualizerState extends State<GraphVisualizer>
 
   void _tick() {
     if (_currentNodeIndex < 0) return;
-    nodes[_currentNodeIndex] = nodes[_currentNodeIndex].copyWith(
+    _graph.nodes[_currentNodeIndex] = _graph.nodes[_currentNodeIndex].copyWith(
       isVisited: true,
     );
     final nextIndex = _getRandomUnvisitedNeighbor(_currentNodeIndex);
     if (nextIndex >= 0) {
       // There are still unvisited neighbors
-      nodes[nextIndex] = nodes[nextIndex].copyWith(
+      _graph.nodes[nextIndex] = _graph.nodes[nextIndex].copyWith(
         isVisited: true,
-        previousNode: nodes[_currentNodeIndex],
+        previousNode: _graph.nodes[_currentNodeIndex],
       );
       _stack.add(_currentNodeIndex);
       _currentNodeIndex = nextIndex;
@@ -95,18 +94,21 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   }
 
   int _getRandomUnvisitedNeighbor(int nodeIndex) {
-    final neighbors = adjacencyList[nodeIndex];
+    final neighbors = _graph.adjacencyList[nodeIndex];
     final unvisited = neighbors
-        .where((index) => !nodes[index].isVisited)
+        .where((index) => !_graph.nodes[index].isVisited)
         .toList();
     if (unvisited.isEmpty) return -1;
     return unvisited[random.nextInt(unvisited.length)];
   }
 
-  void _generateGraph() {
-    _generateNodes();
-    _generateEdges();
-    _generateAdjacencyList();
+  void _initGraph() {
+    _graph = Graph(
+      size: widget.size,
+      nodesCount: widget.nodesCount,
+      cellSizeFraction: cellSizeFraction,
+      mode: _mode,
+    )..init();
   }
 
   void _toggleEdges() {
@@ -134,7 +136,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     _currentNodeIndex = 0;
     _stack = [];
     _paintEdges = true;
-    _generateGraph();
+    _initGraph();
     setState(() {});
   }
 
@@ -145,62 +147,13 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     _onReset();
   }
 
-  void _generateNodes() {
-    late List<Offset> offsets;
-    if (_mode == GraphMode.grid) {
-      offsets = generateGridPoints(
-        canvasSize: widget.size,
-        cellSize: widget.size * cellSizeFraction,
-      );
-    } else if (_mode == GraphMode.circle) {
-      offsets = generateCircularOffsets(
-        radius: widget.size.shortestSide / 2,
-        center: widget.size.center(Offset.zero),
-        count: 10,
-      );
-    } else {
-      offsets = generateRandomPoints(
-        random: random,
-        canvasSize: widget.size,
-        pointsCount: widget.nodesCount,
-      );
-    }
-    nodes = offsets.map((offset) => Node(offset.dx, offset.dy)).toList();
-  }
-
-  void _generateEdges() {
-    if (nodes.isEmpty) throw Exception('Nodes not generated!');
-    edges = [];
-    if (_mode == GraphMode.grid) {
-      edges = generateGridEdges(widget.size, cellSizeFraction);
-    } else {
-      edges = [
-        for (int i = 0; i < nodes.length; i++)
-          for (int j = i + 1; j < nodes.length; j++) [i, j],
-      ];
-    }
-  }
-
-  void _generateAdjacencyList() {
-    if (edges.isEmpty) throw Exception('Edges not generated!');
-
-    adjacencyList = List.generate(nodes.length, (index) {
-      final currentEdges = edges.where((items) => items.contains(index));
-      return currentEdges
-          .map((edges) => edges.where((e) => e != index))
-          .expand((i) => i)
-          .toList()
-        ..sort();
-    });
-  }
-
   void _onEnter(_) {
     //
   }
 
   void _onHover(PointerHoverEvent event) {
     final offset = event.localPosition;
-    final hoveredNodeIndex = nodes.indexWhere(
+    final hoveredNodeIndex = _graph.nodes.indexWhere(
       (node) => isWithinRadius(node.offset, offset, widget.nodeRadius),
     );
     if (hoveredNodeIndex < 0 && _hoveredNodeIndex == hoveredNodeIndex) return;
@@ -226,7 +179,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
 
   void _onPanDown(DragDownDetails details) {
     final offset = details.localPosition;
-    final selectedNodeIndex = nodes.indexWhere(
+    final selectedNodeIndex = _graph.nodes.indexWhere(
       (node) => isWithinRadius(node.offset, offset, widget.nodeRadius),
     );
     if (selectedNodeIndex < 0) return;
@@ -237,8 +190,8 @@ class _GraphVisualizerState extends State<GraphVisualizer>
 
   void _onPanUpdate(DragUpdateDetails details) {
     if (_selectedNodeIndex < 0) return;
-    final Node selectedNode = nodes[_selectedNodeIndex];
-    nodes[_selectedNodeIndex] = selectedNode.copyWith(
+    final Node selectedNode = _graph.nodes[_selectedNodeIndex];
+    _graph.nodes[_selectedNodeIndex] = selectedNode.copyWith(
       x: selectedNode.x + details.delta.dx,
       y: selectedNode.y + details.delta.dy,
     );
@@ -249,7 +202,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   void initState() {
     super.initState();
     _ticker = createTicker(_onTick);
-    _generateGraph();
+    _initGraph();
   }
 
   @override
@@ -282,10 +235,8 @@ class _GraphVisualizerState extends State<GraphVisualizer>
                 ),
                 child: CustomPaint(
                   painter: GraphPainter(
-                    nodes: nodes,
-                    edges: edges,
+                    graph: _graph,
                     nodeRadius: widget.nodeRadius,
-                    adjacencyList: adjacencyList,
                     stack: _stack,
                     paintEdges: _paintEdges,
                     hoverOffset: _hoverOffset,
