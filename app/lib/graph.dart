@@ -35,13 +35,17 @@ class Graph {
     required this.size,
     required this.nodesCount,
     this.cellSizeFraction = 0.18,
+    this.hasDiagonalEdges = true,
     Random? random,
-  }) : _random = random ?? Random();
+  }) : _random = random ?? Random() {
+    _init();
+  }
 
   final GraphMode mode;
   final Size size;
   final int nodesCount;
   final double cellSizeFraction;
+  final bool hasDiagonalEdges;
 
   late List<Node> nodes;
   late List<List<int>> edges;
@@ -49,7 +53,7 @@ class Graph {
 
   late final Random _random;
 
-  void init() {
+  void _init() {
     _generateNodes();
     _generateEdges();
     _generateAdjacencyList();
@@ -83,7 +87,11 @@ class Graph {
 
     edges = [];
     if (mode == GraphMode.grid) {
-      edges = generateGridEdges(size, cellSizeFraction);
+      edges = generateGridEdges(
+        size,
+        cellSizeFraction,
+        withDiagonals: hasDiagonalEdges,
+      );
     } else {
       edges = [
         for (int i = 0; i < nodes.length; i++)
@@ -106,5 +114,14 @@ class Graph {
           .toList()
         ..sort();
     });
+  }
+
+  int getRandomUnvisitedNeighbor(int nodeIndex) {
+    final neighbors = adjacencyList[nodeIndex];
+    final unvisited = neighbors
+        .where((index) => !nodes[index].isVisited)
+        .toList();
+    if (unvisited.isEmpty) return -1;
+    return unvisited[_random.nextInt(unvisited.length)];
   }
 }

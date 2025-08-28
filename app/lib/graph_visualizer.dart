@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:app/graph.dart';
 import 'package:app/graph_painter.dart';
 import 'package:app/utils.dart';
@@ -15,12 +13,14 @@ class GraphVisualizer extends StatefulWidget {
     required this.size,
     this.nodesCount = 10,
     this.nodeRadius = 20,
+    this.cellSizeFraction = 0.18,
     super.key,
   });
 
   final Size size;
   final int nodesCount;
   final double nodeRadius;
+  final double cellSizeFraction;
 
   @override
   State<GraphVisualizer> createState() => _GraphVisualizerState();
@@ -32,6 +32,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
 
   GraphMode _mode = GraphMode.grid;
   bool _paintEdges = true;
+  bool _hasDiagonalEdges = true;
 
   late final Ticker _ticker;
   Duration _elapsed = Duration.zero;
@@ -47,10 +48,6 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   int _selectedNodeIndex = -1;
   int _hoveredNodeIndex = -1;
   int _currentNodeIndex = 0;
-
-  static final random = Random();
-
-  static const cellSizeFraction = 0.18;
 
   List<int> get hoveredNodeNeighbors {
     if (_hoverOffset == null || _hoveredNodeIndex < 0) return [];
@@ -74,7 +71,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     _graph.nodes[_currentNodeIndex] = _graph.nodes[_currentNodeIndex].copyWith(
       isVisited: true,
     );
-    final nextIndex = _getRandomUnvisitedNeighbor(_currentNodeIndex);
+    final nextIndex = _graph.getRandomUnvisitedNeighbor(_currentNodeIndex);
     if (nextIndex >= 0) {
       // There are still unvisited neighbors
       _graph.nodes[nextIndex] = _graph.nodes[nextIndex].copyWith(
@@ -93,22 +90,14 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     }
   }
 
-  int _getRandomUnvisitedNeighbor(int nodeIndex) {
-    final neighbors = _graph.adjacencyList[nodeIndex];
-    final unvisited = neighbors
-        .where((index) => !_graph.nodes[index].isVisited)
-        .toList();
-    if (unvisited.isEmpty) return -1;
-    return unvisited[random.nextInt(unvisited.length)];
-  }
-
   void _initGraph() {
     _graph = Graph(
       size: widget.size,
       nodesCount: widget.nodesCount,
-      cellSizeFraction: cellSizeFraction,
+      cellSizeFraction: widget.cellSizeFraction,
+      hasDiagonalEdges: _hasDiagonalEdges,
       mode: _mode,
-    )..init();
+    );
   }
 
   void _toggleEdges() {
@@ -143,6 +132,13 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   void _onModeChanged(GraphMode mode) {
     setState(() {
       _mode = mode;
+    });
+    _onReset();
+  }
+
+  void _onDiagonalEdgesToggle() {
+    setState(() {
+      _hasDiagonalEdges = !_hasDiagonalEdges;
     });
     _onReset();
   }
@@ -268,6 +264,16 @@ class _GraphVisualizerState extends State<GraphVisualizer>
                 color: Colors.white,
                 icon: Icon(
                   _paintEdges ? Icons.visibility : Icons.visibility_off,
+                ),
+              ),
+              Opacity(
+                opacity: _hasDiagonalEdges ? 1 : 0.5,
+                child: IconButton(
+                  onPressed: _onDiagonalEdgesToggle,
+                  color: Colors.white,
+                  icon: Icon(
+                    Icons.call_received,
+                  ),
                 ),
               ),
               ElevatedButton(
