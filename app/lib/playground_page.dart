@@ -41,6 +41,7 @@ class GraphPainter extends StatefulWidget {
 
 class _GraphPainterState extends State<GraphPainter> {
   late List<Node> nodes;
+  late Set<List<int>> edges;
   static final random = Random();
 
   void _generateNodes() {
@@ -50,6 +51,12 @@ class _GraphPainterState extends State<GraphPainter> {
       pointsCount: widget.nodesCount,
     );
     nodes = offsets.map((offset) => Node(offset.dx, offset.dy)).toList();
+    edges = Set.from(
+      List.generate(nodes.length, (sourceIndex) {
+        return List.generate(2, (targetIndex) => [sourceIndex, targetIndex]);
+      }).expand((i) => i),
+    );
+    print(edges);
   }
 
   @override
@@ -63,6 +70,7 @@ class _GraphPainterState extends State<GraphPainter> {
     return CustomPaint(
       painter: PlaygroundPainter(
         nodes: nodes,
+        edges: edges,
       ),
     );
   }
@@ -71,14 +79,35 @@ class _GraphPainterState extends State<GraphPainter> {
 class PlaygroundPainter extends CustomPainter {
   PlaygroundPainter({
     required this.nodes,
+    required this.edges,
   });
 
   final List<Node> nodes;
+  late Set<List<int>> edges;
+
+  static const nodeRadius = 20.0;
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (final node in nodes) {
-      canvas.drawCircle(node.offset, 10, Paint()..color = Colors.white);
+    for (final edge in edges) {
+      canvas.drawLine(
+        nodes[edge[0]].offset,
+        nodes[edge[1]].offset,
+        Paint()
+          ..color = Colors.grey
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 4,
+      );
+    }
+    for (final (index, node) in nodes.indexed) {
+      canvas.drawCircle(node.offset, nodeRadius, Paint()..color = Colors.white);
+      paintText(
+        canvas,
+        nodeRadius,
+        offset: node.offset,
+        text: index.toString(),
+        fontSize: nodeRadius * 0.8,
+      );
     }
   }
 

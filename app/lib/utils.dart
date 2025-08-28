@@ -37,5 +37,8 @@ void paintText(
     textDirection: TextDirection.ltr,
   );
   textPainter.layout(minWidth: 0, maxWidth: maxWidth);
-  textPainter.paint(canvas, offset);
+  textPainter.paint(
+    canvas,
+    offset - Offset(textPainter.width / 2, textPainter.height / 2),
+  );
 }
