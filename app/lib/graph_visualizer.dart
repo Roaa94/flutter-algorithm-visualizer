@@ -5,36 +5,47 @@ import 'package:app/graph_painter.dart';
 import 'package:app/utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
+import 'custom_radio_group.dart';
 import 'node.dart';
 
 class GraphVisualizer extends StatefulWidget {
   const GraphVisualizer({
     required this.size,
     this.nodesCount = 10,
-    this.mode = GraphMode.grid,
-    this.triggerReset = false,
     this.nodeRadius = 20,
     super.key,
   });
 
   final Size size;
   final int nodesCount;
-  final GraphMode mode;
-  final bool triggerReset;
   final double nodeRadius;
 
   @override
   State<GraphVisualizer> createState() => _GraphVisualizerState();
 }
 
-class _GraphVisualizerState extends State<GraphVisualizer> {
+class _GraphVisualizerState extends State<GraphVisualizer>
+    with SingleTickerProviderStateMixin {
+  static const int _desiredFrameRate = 2; // 1 frame per second
+
+  GraphMode _mode = GraphMode.grid;
+
+  late final Ticker _ticker;
+  Duration _elapsed = Duration.zero;
+  Duration? _lastElapsed;
+  final Duration _desiredFrameTime = Duration(
+    milliseconds: (1000 / _desiredFrameRate).floor(),
+  );
+
   late List<Node> nodes;
   late Set<List<int>> edges;
   late List<List<int>> adjacencyList;
   Offset? _hoverOffset;
   int _selectedNodeIndex = -1;
   int _hoveredNodeIndex = -1;
+  int _currentNodeIndex = -1;
 
   static final random = Random();
 
@@ -45,20 +56,63 @@ class _GraphVisualizerState extends State<GraphVisualizer> {
     return adjacencyList[_hoveredNodeIndex];
   }
 
+  void _onTick(Duration elapsed) {
+    _elapsed = elapsed;
+    if (_lastElapsed != null) {
+      if (_elapsed - _lastElapsed! < _desiredFrameTime) {
+        return;
+      }
+    }
+    _lastElapsed = elapsed;
+    _tick();
+    setState(() {});
+  }
+
+  void _tick() {
+    //
+  }
+
   void _generateGraph() {
     _generateNodes();
     _generateEdges();
     _generateAdjacencyList();
   }
 
+  void _toggle() {
+    if (_ticker.isActive) {
+      _ticker.stop();
+      _lastElapsed = null;
+    } else {
+      _ticker.start();
+    }
+    setState(() {});
+  }
+
+  void _onReset() {
+    if (_ticker.isActive) {
+      _ticker.stop(canceled: true);
+    }
+    _elapsed = Duration.zero;
+    _lastElapsed = null;
+    _generateGraph();
+    setState(() {});
+  }
+
+  void _onModeChanged(GraphMode mode) {
+    setState(() {
+      _mode = mode;
+    });
+    _onReset();
+  }
+
   void _generateNodes() {
     late List<Offset> offsets;
-    if (widget.mode == GraphMode.grid) {
+    if (_mode == GraphMode.grid) {
       offsets = generateGridPoints(
         canvasSize: widget.size,
         cellSize: widget.size * cellSizeFraction,
       );
-    } else if (widget.mode == GraphMode.circle) {
+    } else if (_mode == GraphMode.circle) {
       offsets = generateCircularOffsets(
         radius: widget.size.shortestSide / 2,
         center: widget.size.center(Offset.zero),
@@ -76,7 +130,7 @@ class _GraphVisualizerState extends State<GraphVisualizer> {
 
   void _generateEdges() {
     if (nodes.isEmpty) throw Exception('Nodes not generated!');
-    if (widget.mode == GraphMode.grid) {
+    if (_mode == GraphMode.grid) {
       // ---- Build grid edges (8-neighbor connectivity) ----
       final cols = (widget.size.width / (widget.size.width * cellSizeFraction))
           .floor();
@@ -183,46 +237,78 @@ class _GraphVisualizerState extends State<GraphVisualizer> {
   @override
   void initState() {
     super.initState();
+    _ticker = createTicker(_onTick);
     _generateGraph();
   }
 
   @override
   void didUpdateWidget(covariant GraphVisualizer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.triggerReset != widget.triggerReset ||
-        oldWidget.mode != widget.mode) {
-      _generateGraph();
+    if (oldWidget.size != widget.size) {
+      _onReset();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onHover: _onHover,
-      onEnter: _onEnter,
-      onExit: _onExit,
-      child: GestureDetector(
-        onPanDown: _onPanDown,
-        onPanUpdate: _onPanUpdate,
-        onPanEnd: _onPanEnd,
-        behavior: HitTestBehavior.opaque,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.white.withAlpha(50)),
-          ),
-          child: CustomPaint(
-            painter: GraphPainter(
-              nodes: nodes,
-              edges: edges,
-              nodeRadius: widget.nodeRadius,
-              adjacencyList: adjacencyList,
-              hoverOffset: _hoverOffset,
-              hoveredNodeIndex: _hoveredNodeIndex,
-              selectedNodeIndex: _selectedNodeIndex,
+    return Center(
+      child: Column(
+        spacing: 20,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          MouseRegion(
+            onHover: _onHover,
+            onEnter: _onEnter,
+            onExit: _onExit,
+            child: GestureDetector(
+              onPanDown: _onPanDown,
+              onPanUpdate: _onPanUpdate,
+              onPanEnd: _onPanEnd,
+              behavior: HitTestBehavior.opaque,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white.withAlpha(50)),
+                ),
+                child: CustomPaint(
+                  painter: GraphPainter(
+                    nodes: nodes,
+                    edges: edges,
+                    nodeRadius: widget.nodeRadius,
+                    adjacencyList: adjacencyList,
+                    hoverOffset: _hoverOffset,
+                    hoveredNodeIndex: _hoveredNodeIndex,
+                    selectedNodeIndex: _selectedNodeIndex,
+                  ),
+                  child: SizedBox(
+                    width: widget.size.width,
+                    height: widget.size.height,
+                  ),
+                ),
+              ),
             ),
-            child: Container(),
           ),
-        ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 20,
+            children: [
+              ElevatedButton(
+                onPressed: _onReset,
+                child: Text('Reset'),
+              ),
+              Flexible(
+                child: SizedBox(
+                  width: 400,
+                  child: CustomRadioGroup<GraphMode>(
+                    selectedItem: _mode,
+                    items: GraphMode.values,
+                    onChanged: _onModeChanged,
+                    labelBuilder: (m) => m.label,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
