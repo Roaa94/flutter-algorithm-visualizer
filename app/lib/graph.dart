@@ -50,6 +50,8 @@ class Graph {
   late List<Node> nodes;
   late List<List<int>> edges;
   late List<List<int>> adjacencyList;
+  late List<int> stack;
+  late int activeNodeIndex;
 
   late final Random _random;
 
@@ -57,6 +59,9 @@ class Graph {
     _generateNodes();
     _generateEdges();
     _generateAdjacencyList();
+    stack = [];
+    // Todo: allow custom starting node
+    activeNodeIndex = 0;
   }
 
   void _generateNodes() {
@@ -123,5 +128,30 @@ class Graph {
         .toList();
     if (unvisited.isEmpty) return -1;
     return unvisited[_random.nextInt(unvisited.length)];
+  }
+
+  bool dfsStep() {
+    if (activeNodeIndex < 0) return true;
+    nodes[activeNodeIndex] = nodes[activeNodeIndex].copyWith(
+      isVisited: true,
+    );
+    final nextIndex = getRandomUnvisitedNeighbor(activeNodeIndex);
+    if (nextIndex >= 0) {
+      // There are still unvisited neighbors
+      nodes[nextIndex] = nodes[nextIndex].copyWith(
+        isVisited: true,
+        previousNode: nodes[activeNodeIndex],
+      );
+      stack.add(activeNodeIndex);
+      activeNodeIndex = nextIndex;
+    } else if (stack.isNotEmpty) {
+      // No neighbors left to visit
+      activeNodeIndex = stack.removeLast();
+    } else {
+      // DFS completed
+      activeNodeIndex = -1;
+      return true;
+    }
+    return false;
   }
 }

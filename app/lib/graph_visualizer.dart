@@ -44,10 +44,8 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   late Graph _graph;
 
   Offset? _hoverOffset;
-  List<int> _stack = [];
   int _selectedNodeIndex = -1;
   int _hoveredNodeIndex = -1;
-  int _currentNodeIndex = 0;
 
   List<int> get hoveredNodeNeighbors {
     if (_hoverOffset == null || _hoveredNodeIndex < 0) return [];
@@ -67,26 +65,9 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   }
 
   void _tick() {
-    if (_currentNodeIndex < 0) return;
-    _graph.nodes[_currentNodeIndex] = _graph.nodes[_currentNodeIndex].copyWith(
-      isVisited: true,
-    );
-    final nextIndex = _graph.getRandomUnvisitedNeighbor(_currentNodeIndex);
-    if (nextIndex >= 0) {
-      // There are still unvisited neighbors
-      _graph.nodes[nextIndex] = _graph.nodes[nextIndex].copyWith(
-        isVisited: true,
-        previousNode: _graph.nodes[_currentNodeIndex],
-      );
-      _stack.add(_currentNodeIndex);
-      _currentNodeIndex = nextIndex;
-    } else if (_stack.isNotEmpty) {
-      // No neighbors left to visit
-      _currentNodeIndex = _stack.removeLast();
-    } else {
-      // DFS completed
+    final complete = _graph.dfsStep();
+    if (complete) {
       _paintEdges = false;
-      _currentNodeIndex = -1;
     }
   }
 
@@ -122,8 +103,6 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     }
     _elapsed = Duration.zero;
     _lastElapsed = null;
-    _currentNodeIndex = 0;
-    _stack = [];
     _paintEdges = true;
     _initGraph();
     setState(() {});
@@ -233,12 +212,10 @@ class _GraphVisualizerState extends State<GraphVisualizer>
                   painter: GraphPainter(
                     graph: _graph,
                     nodeRadius: widget.nodeRadius,
-                    stack: _stack,
                     paintEdges: _paintEdges,
                     hoverOffset: _hoverOffset,
                     hoveredNodeIndex: _hoveredNodeIndex,
                     selectedNodeIndex: _selectedNodeIndex,
-                    currentNodeIndex: _currentNodeIndex,
                   ),
                   child: SizedBox(
                     width: widget.size.width,

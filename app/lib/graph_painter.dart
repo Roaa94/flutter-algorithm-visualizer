@@ -9,9 +9,7 @@ class GraphPainter extends CustomPainter {
     this.hoverOffset,
     this.hoveredNodeIndex = -1,
     this.selectedNodeIndex = -1,
-    this.currentNodeIndex = -1,
     this.nodeRadius = 20,
-    this.stack = const [],
     this.paintEdges = true,
   });
 
@@ -19,9 +17,7 @@ class GraphPainter extends CustomPainter {
   final Offset? hoverOffset;
   final int selectedNodeIndex;
   final int hoveredNodeIndex;
-  final int currentNodeIndex;
   final double nodeRadius;
-  final List<int> stack;
   final bool paintEdges;
 
   static const primaryColor = Colors.blue;
@@ -80,8 +76,8 @@ class GraphPainter extends CustomPainter {
           graph.adjacencyList[selectedNodeIndex].contains(
             index,
           );
-      bool isCurrent = currentNodeIndex == index;
-      bool inStack = stack.contains(index);
+      bool isCurrent = graph.activeNodeIndex == index;
+      bool inStack = graph.stack.contains(index);
 
       bool active = isSelected || isCurrent;
       bool secondary =
