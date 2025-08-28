@@ -96,3 +96,7 @@ void paintText(
     offset - Offset(textPainter.width / 2, textPainter.height / 2),
   );
 }
+
+bool isWithinRadius(Offset origin, Offset target, double radius) {
+  return (target - origin).distance <= radius;
+}
