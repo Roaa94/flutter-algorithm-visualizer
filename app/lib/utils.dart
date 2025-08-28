@@ -15,6 +15,24 @@ List<Offset> generateRandomPoints({
   });
 }
 
+List<Offset> generateGridPoints({
+  required Size canvasSize,
+  required Size cellSize,
+}) {
+  assert(cellSize < canvasSize);
+  final list = <Offset>[];
+  final cols = (canvasSize.width / cellSize.width).floor();
+  final rows = (canvasSize.height / cellSize.height).floor();
+  for (int i = 0; i < cols * rows; i++) {
+    final col = i % cols;
+    final row = i ~/ cols;
+    final centerX = col * cellSize.width + cellSize.width / 2;
+    final centerY = row * cellSize.height + cellSize.height / 2;
+    list.add(Offset(centerX, centerY));
+  }
+  return list;
+}
+
 int indexByCoords(int x, int y, int cols, int rows) {
   if (x < 0 || y < 0 || x > cols - 1 || y > rows - 1) {
     return -1;
