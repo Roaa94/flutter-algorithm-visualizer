@@ -41,7 +41,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   );
 
   late List<Node> nodes;
-  late Set<List<int>> edges;
+  late List<List<int>> edges;
   late List<List<int>> adjacencyList;
   Offset? _hoverOffset;
   List<int> _stack = [];
@@ -170,6 +170,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
 
   void _generateEdges() {
     if (nodes.isEmpty) throw Exception('Nodes not generated!');
+    edges = [];
     if (_mode == GraphMode.grid) {
       // ---- Build grid edges (8-neighbor connectivity) ----
       final cols = (widget.size.width / (widget.size.width * cellSizeFraction))
@@ -186,8 +187,6 @@ class _GraphVisualizerState extends State<GraphVisualizer>
         (-1, 1), // up-right
       ];
 
-      final edgeList = <List<int>>[];
-
       for (int r = 0; r < rows; r++) {
         for (int c = 0; c < cols; c++) {
           final a = r * cols + c;
@@ -195,18 +194,16 @@ class _GraphVisualizerState extends State<GraphVisualizer>
             final nr = r + dr, nc = c + dc;
             if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
               final b = nr * cols + nc;
-              edgeList.add([a, b]); // each edge added exactly once
+              edges.add([a, b]); // each edge added exactly once
             }
           }
         }
       }
-
-      edges = edgeList.toSet();
     } else {
-      edges = {
+      edges = [
         for (int i = 0; i < nodes.length; i++)
           for (int j = i + 1; j < nodes.length; j++) [i, j],
-      };
+      ];
     }
   }
 

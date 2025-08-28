@@ -18,7 +18,7 @@ class GraphPainter extends CustomPainter {
   });
 
   final List<Node> nodes;
-  final Set<List<int>> edges;
+  final List<List<int>> edges;
   final List<List<int>> adjacencyList;
   final Offset? hoverOffset;
   final int selectedNodeIndex;
