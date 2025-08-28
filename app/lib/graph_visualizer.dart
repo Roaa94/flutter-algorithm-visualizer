@@ -31,6 +31,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   static const int _desiredFrameRate = 2; // 1 frame per second
 
   GraphMode _mode = GraphMode.grid;
+  bool _paintEdges = true;
 
   late final Ticker _ticker;
   Duration _elapsed = Duration.zero;
@@ -43,7 +44,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   late Set<List<int>> edges;
   late List<List<int>> adjacencyList;
   Offset? _hoverOffset;
-  List<int> stack = [];
+  List<int> _stack = [];
   int _selectedNodeIndex = -1;
   int _hoveredNodeIndex = -1;
   int _currentNodeIndex = 0;
@@ -77,13 +78,18 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     final nextIndex = _getRandomUnvisitedNeighbor(_currentNodeIndex);
     if (nextIndex >= 0) {
       // There are still unvisited neighbors
-      nodes[nextIndex] = nodes[nextIndex].copyWith(isVisited: true);
-      stack.add(_currentNodeIndex);
+      nodes[nextIndex] = nodes[nextIndex].copyWith(
+        isVisited: true,
+        previousNode: nodes[_currentNodeIndex],
+      );
+      _stack.add(_currentNodeIndex);
       _currentNodeIndex = nextIndex;
-    } else if (stack.isNotEmpty) {
+    } else if (_stack.isNotEmpty) {
       // No neighbors left to visit
-      _currentNodeIndex = stack.removeLast();
+      _currentNodeIndex = _stack.removeLast();
     } else {
+      // DFS completed
+      _paintEdges = false;
       _currentNodeIndex = -1;
     }
   }
@@ -103,6 +109,12 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     _generateAdjacencyList();
   }
 
+  void _toggleEdges() {
+    setState(() {
+      _paintEdges = !_paintEdges;
+    });
+  }
+
   void _toggle() {
     if (_ticker.isActive) {
       _ticker.stop();
@@ -119,6 +131,9 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     }
     _elapsed = Duration.zero;
     _lastElapsed = null;
+    _currentNodeIndex = 0;
+    _stack = [];
+    _paintEdges = true;
     _generateGraph();
     setState(() {});
   }
@@ -264,7 +279,6 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     super.initState();
     _ticker = createTicker(_onTick);
     _generateGraph();
-    _toggle();
   }
 
   @override
@@ -301,6 +315,8 @@ class _GraphVisualizerState extends State<GraphVisualizer>
                     edges: edges,
                     nodeRadius: widget.nodeRadius,
                     adjacencyList: adjacencyList,
+                    stack: _stack,
+                    paintEdges: _paintEdges,
                     hoverOffset: _hoverOffset,
                     hoveredNodeIndex: _hoveredNodeIndex,
                     selectedNodeIndex: _selectedNodeIndex,
@@ -318,6 +334,20 @@ class _GraphVisualizerState extends State<GraphVisualizer>
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 20,
             children: [
+              IconButton(
+                onPressed: _toggle,
+                color: Colors.white,
+                icon: Icon(
+                  _ticker.isActive ? Icons.pause : Icons.play_arrow,
+                ),
+              ),
+              IconButton(
+                onPressed: _toggleEdges,
+                color: Colors.white,
+                icon: Icon(
+                  _paintEdges ? Icons.visibility : Icons.visibility_off,
+                ),
+              ),
               ElevatedButton(
                 onPressed: _onReset,
                 child: Text('Reset'),

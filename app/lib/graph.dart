@@ -5,6 +5,15 @@ import 'package:app/utils.dart';
 
 import 'node.dart';
 
+enum Algorithm {
+  dfs('DFS'),
+  bfs('BFS');
+
+  const Algorithm(this.label);
+
+  final String label;
+}
+
 enum GraphMode {
   grid('Grid'),
   circle('Circle'),

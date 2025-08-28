@@ -100,3 +100,45 @@ void paintText(
 bool isWithinRadius(Offset origin, Offset target, double radius) {
   return (target - origin).distance <= radius;
 }
+
+void drawArrow(
+  Canvas canvas,
+  Offset p1,
+  Offset p2,
+  double shortenBy,
+  double arrowSize,
+  Paint paint,
+) {
+  final dir = p2 - p1;
+  final distance = dir.distance;
+
+  if (distance <= shortenBy + arrowSize) {
+    // Too close — skip drawing
+    return;
+  }
+
+  final unitDir = dir / distance;
+
+  // Shorten the line so arrow sits at the end
+  final newEnd = p2 - unitDir * (shortenBy + arrowSize);
+  canvas.drawLine(p1, newEnd, paint);
+
+  // Base center of the arrow triangle
+  final arrowBaseCenter = p2 - unitDir * (arrowSize * 2 + shortenBy);
+
+  // Perpendicular vector to the line
+  final perp = Offset(-unitDir.dy, unitDir.dx);
+
+  // Triangle points
+  final tip = p2 - unitDir * shortenBy;
+  final left = arrowBaseCenter + perp * arrowSize;
+  final right = arrowBaseCenter - perp * arrowSize;
+
+  final path = Path()
+    ..moveTo(tip.dx, tip.dy)
+    ..lineTo(left.dx, left.dy)
+    ..lineTo(right.dx, right.dy)
+    ..close();
+
+  canvas.drawPath(path, paint);
+}

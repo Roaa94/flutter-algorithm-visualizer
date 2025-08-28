@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'node.dart';
 
-const _isDebug = false;
-
 class GraphPainter extends CustomPainter {
   GraphPainter({
     required this.nodes,
@@ -15,6 +13,8 @@ class GraphPainter extends CustomPainter {
     this.selectedNodeIndex = -1,
     this.currentNodeIndex = -1,
     this.nodeRadius = 20,
+    this.stack = const [],
+    this.paintEdges = true,
   });
 
   final List<Node> nodes;
@@ -25,42 +25,50 @@ class GraphPainter extends CustomPainter {
   final int hoveredNodeIndex;
   final int currentNodeIndex;
   final double nodeRadius;
+  final List<int> stack;
+  final bool paintEdges;
 
   static const primaryColor = Colors.blue;
   static const activeColor = Colors.pink;
   static const secondaryColor = Colors.yellow;
 
+  final linePaint = Paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 4;
+
+  final nodePaint = Paint();
+
   @override
   void paint(Canvas canvas, Size size) {
-    for (final edge in edges) {
-      final start = nodes[edge.first].offset;
-      final end = nodes[edge.last].offset;
-      final isHovered =
-          hoveredNodeIndex >= 0 && edge.contains(hoveredNodeIndex);
-      final isSelected =
-          selectedNodeIndex >= 0 && edge.contains(selectedNodeIndex);
+    if (paintEdges) {
+      for (final edge in edges) {
+        final start = nodes[edge.first].offset;
+        final end = nodes[edge.last].offset;
+        final isHovered =
+            hoveredNodeIndex >= 0 && edge.contains(hoveredNodeIndex);
+        final isSelected =
+            selectedNodeIndex >= 0 && edge.contains(selectedNodeIndex);
 
-      final secondary = isHovered || isSelected;
+        final secondary = isHovered || isSelected;
 
-      canvas.drawLine(
-        start,
-        end,
-        Paint()
-          ..color = secondary ? secondaryColor : Colors.grey
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 4,
-      );
+        canvas.drawLine(
+          start,
+          end,
+          linePaint..color = secondary ? secondaryColor : Colors.grey,
+        );
+      }
+    }
 
-      if (_isDebug) {
-        paintText(
+    for (final node in nodes) {
+      if (node.previousNode != null) {
+        // Draw arrow from previous to current node
+        drawArrow(
           canvas,
-          1000,
-          text: '[$start, $end]',
-          offset: Offset(
-            (start.dx + end.dx) / 2,
-            (start.dy + end.dy) / 2,
-          ),
-          color: Colors.yellow,
+          node.previousNode!.offset,
+          node.offset,
+          nodeRadius,
+          5,
+          linePaint..color = secondaryColor,
         );
       }
     }
@@ -77,21 +85,23 @@ class GraphPainter extends CustomPainter {
             index,
           );
       bool isCurrent = currentNodeIndex == index;
+      bool inStack = stack.contains(index);
 
       bool active = isSelected || isCurrent;
-      bool secondary = isHoveredNeighbor || isSelectedNeighbor;
-      bool primary = isHovered || node.isVisited;
+      bool secondary =
+          isHoveredNeighbor || isSelectedNeighbor || node.isVisited;
+      bool primary = isHovered || inStack;
 
       canvas.drawCircle(
         node.offset,
         nodeRadius,
-        Paint()
+        nodePaint
           ..color = active
               ? activeColor
-              : secondary
-              ? secondaryColor
               : primary
               ? primaryColor
+              : secondary
+              ? secondaryColor
               : Colors.white,
       );
       paintText(
