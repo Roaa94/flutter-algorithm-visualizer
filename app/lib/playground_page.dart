@@ -51,6 +51,7 @@ class _GraphPainterState extends State<GraphPainter> {
   late Set<List<int>> edges;
   late List<List<int>> adjacencyList;
   Offset? _hoverOffset;
+  int _selectedNodeIndex = -1;
 
   static final random = Random();
 
@@ -159,21 +160,39 @@ class _GraphPainterState extends State<GraphPainter> {
   }
 
   void _onExit(_) {
+    if (_hoverOffset != null) {
+      setState(() {
+        _hoverOffset = null;
+      });
+    }
+  }
+
+  void _onPanEnd(_) {
+    if (_selectedNodeIndex < 0) return;
     setState(() {
-      _hoverOffset = null;
+      _selectedNodeIndex = -1;
     });
   }
 
-  void _onTapDown(TapDownDetails details) {
-    //
+  void _onPanDown(DragDownDetails details) {
+    final offset = details.localPosition;
+    final selectedNodeIndex = nodes.indexWhere(
+      (node) => isWithinRadius(node.offset, offset, nodeRadius),
+    );
+    if (selectedNodeIndex < 0) return;
+    setState(() {
+      _selectedNodeIndex = selectedNodeIndex;
+    });
   }
 
-  void _onTapUp(TapUpDetails details) {
-    //
-  }
-
-  void _onTap() {
-    //
+  void _onPanUpdate(DragUpdateDetails details) {
+    if (_selectedNodeIndex < 0) return;
+    final Node selectedNode = nodes[_selectedNodeIndex];
+    nodes[_selectedNodeIndex] = selectedNode.copyWith(
+      x: selectedNode.x + details.delta.dx,
+      y: selectedNode.y + details.delta.dy,
+    );
+    setState(() {});
   }
 
   @override
@@ -189,12 +208,12 @@ class _GraphPainterState extends State<GraphPainter> {
       onEnter: _onEnter,
       onExit: _onExit,
       child: GestureDetector(
-        onTap: _onTap,
-        onTapDown: _onTapDown,
-        onTapUp: _onTapUp,
+        onPanDown: _onPanDown,
+        onPanUpdate: _onPanUpdate,
+        onPanEnd: _onPanEnd,
         behavior: HitTestBehavior.opaque,
         child: ColoredBox(
-          color: Colors.red.withAlpha(50),
+          color: Colors.red.withAlpha(0),
           child: CustomPaint(
             painter: PlaygroundPainter(
               nodes: nodes,
@@ -202,7 +221,7 @@ class _GraphPainterState extends State<GraphPainter> {
               adjacencyList: adjacencyList,
               hoverOffset: _hoverOffset,
               hoveredNodeIndex: hoveredNodeIndex,
-              hoveredNodeNeighbors: hoveredNodeNeighbors,
+              selectedNodeIndex: _selectedNodeIndex,
             ),
             child: Container(),
           ),
@@ -219,28 +238,31 @@ class PlaygroundPainter extends CustomPainter {
     required this.adjacencyList,
     this.hoverOffset,
     this.hoveredNodeIndex = -1,
-    this.hoveredNodeNeighbors = const [],
+    this.selectedNodeIndex = -1,
   });
 
   final List<Node> nodes;
   final Set<List<int>> edges;
   final List<List<int>> adjacencyList;
   final Offset? hoverOffset;
+  final int selectedNodeIndex;
   final int hoveredNodeIndex;
-  final List<int> hoveredNodeNeighbors;
 
   @override
   void paint(Canvas canvas, Size size) {
     for (final edge in edges) {
       final start = nodes[edge.first].offset;
       final end = nodes[edge.last].offset;
-      final isHovered = edge.contains(hoveredNodeIndex);
+      final isHovered =
+          hoveredNodeIndex >= 0 && edge.contains(hoveredNodeIndex);
+      final isSelected =
+          selectedNodeIndex >= 0 && edge.contains(selectedNodeIndex);
 
       canvas.drawLine(
         start,
         end,
         Paint()
-          ..color = isHovered ? Colors.yellow : Colors.grey
+          ..color = isHovered || isSelected ? Colors.yellow : Colors.grey
           ..style = PaintingStyle.stroke
           ..strokeWidth = 4,
       );
@@ -260,14 +282,24 @@ class PlaygroundPainter extends CustomPainter {
     }
 
     for (final (index, node) in nodes.indexed) {
+      bool isSelected = selectedNodeIndex == index;
       bool isHovered = hoveredNodeIndex == index;
-      bool isHoveredNeighbor = hoveredNodeNeighbors.contains(index);
+      bool isHoveredNeighbor =
+          hoveredNodeIndex >= 0 &&
+          adjacencyList[hoveredNodeIndex].contains(index);
+      bool isSelectedNeighbor =
+          selectedNodeIndex >= 0 &&
+          adjacencyList[selectedNodeIndex].contains(
+            index,
+          );
 
       canvas.drawCircle(
         node.offset,
         nodeRadius,
         Paint()
-          ..color = isHoveredNeighbor
+          ..color = isSelected
+              ? Colors.pink
+              : isHoveredNeighbor || isSelectedNeighbor
               ? Colors.yellow
               : isHovered
               ? Colors.blue
