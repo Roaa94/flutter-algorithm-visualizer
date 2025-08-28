@@ -13,6 +13,7 @@ class GraphPainter extends CustomPainter {
     this.hoverOffset,
     this.hoveredNodeIndex = -1,
     this.selectedNodeIndex = -1,
+    this.currentNodeIndex = -1,
     this.nodeRadius = 20,
   });
 
@@ -22,7 +23,12 @@ class GraphPainter extends CustomPainter {
   final Offset? hoverOffset;
   final int selectedNodeIndex;
   final int hoveredNodeIndex;
+  final int currentNodeIndex;
   final double nodeRadius;
+
+  static const primaryColor = Colors.blue;
+  static const activeColor = Colors.pink;
+  static const secondaryColor = Colors.yellow;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -34,11 +40,13 @@ class GraphPainter extends CustomPainter {
       final isSelected =
           selectedNodeIndex >= 0 && edge.contains(selectedNodeIndex);
 
+      final secondary = isHovered || isSelected;
+
       canvas.drawLine(
         start,
         end,
         Paint()
-          ..color = isHovered || isSelected ? Colors.yellow : Colors.grey
+          ..color = secondary ? secondaryColor : Colors.grey
           ..style = PaintingStyle.stroke
           ..strokeWidth = 4,
       );
@@ -68,17 +76,22 @@ class GraphPainter extends CustomPainter {
           adjacencyList[selectedNodeIndex].contains(
             index,
           );
+      bool isCurrent = currentNodeIndex == index;
+
+      bool active = isSelected || isCurrent;
+      bool secondary = isHoveredNeighbor || isSelectedNeighbor;
+      bool primary = isHovered || node.isVisited;
 
       canvas.drawCircle(
         node.offset,
         nodeRadius,
         Paint()
-          ..color = isSelected
-              ? Colors.pink
-              : isHoveredNeighbor || isSelectedNeighbor
-              ? Colors.yellow
-              : isHovered
-              ? Colors.blue
+          ..color = active
+              ? activeColor
+              : secondary
+              ? secondaryColor
+              : primary
+              ? primaryColor
               : Colors.white,
       );
       paintText(

@@ -43,9 +43,10 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   late Set<List<int>> edges;
   late List<List<int>> adjacencyList;
   Offset? _hoverOffset;
+  List<int> stack = [];
   int _selectedNodeIndex = -1;
   int _hoveredNodeIndex = -1;
-  int _currentNodeIndex = -1;
+  int _currentNodeIndex = 0;
 
   static final random = Random();
 
@@ -69,7 +70,31 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   }
 
   void _tick() {
-    //
+    if (_currentNodeIndex < 0) return;
+    nodes[_currentNodeIndex] = nodes[_currentNodeIndex].copyWith(
+      isVisited: true,
+    );
+    final nextIndex = _getRandomUnvisitedNeighbor(_currentNodeIndex);
+    if (nextIndex >= 0) {
+      // There are still unvisited neighbors
+      nodes[nextIndex] = nodes[nextIndex].copyWith(isVisited: true);
+      stack.add(_currentNodeIndex);
+      _currentNodeIndex = nextIndex;
+    } else if (stack.isNotEmpty) {
+      // No neighbors left to visit
+      _currentNodeIndex = stack.removeLast();
+    } else {
+      _currentNodeIndex = -1;
+    }
+  }
+
+  int _getRandomUnvisitedNeighbor(int nodeIndex) {
+    final neighbors = adjacencyList[nodeIndex];
+    final unvisited = neighbors
+        .where((index) => !nodes[index].isVisited)
+        .toList();
+    if (unvisited.isEmpty) return -1;
+    return unvisited[random.nextInt(unvisited.length)];
   }
 
   void _generateGraph() {
@@ -239,6 +264,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     super.initState();
     _ticker = createTicker(_onTick);
     _generateGraph();
+    _toggle();
   }
 
   @override
@@ -278,6 +304,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
                     hoverOffset: _hoverOffset,
                     hoveredNodeIndex: _hoveredNodeIndex,
                     selectedNodeIndex: _selectedNodeIndex,
+                    currentNodeIndex: _currentNodeIndex,
                   ),
                   child: SizedBox(
                     width: widget.size.width,
