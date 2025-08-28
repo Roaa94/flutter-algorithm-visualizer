@@ -114,19 +114,15 @@ class _GraphPainterState extends State<GraphPainter> {
   late List<List<int>> adjacencyList;
   Offset? _hoverOffset;
   int _selectedNodeIndex = -1;
+  int _hoveredNodeIndex = -1;
 
   static final random = Random();
 
-  int get hoveredNodeIndex {
-    if (_hoverOffset == null) return -1;
-    return nodes.indexWhere(
-      (node) => isWithinRadius(node.offset, _hoverOffset!, nodeRadius),
-    );
-  }
+  static const cellSizeFraction = 0.18;
 
   List<int> get hoveredNodeNeighbors {
-    if (_hoverOffset == null || hoveredNodeIndex < 0) return [];
-    return adjacencyList[hoveredNodeIndex];
+    if (_hoverOffset == null || _hoveredNodeIndex < 0) return [];
+    return adjacencyList[_hoveredNodeIndex];
   }
 
   void _generateGraph() {
@@ -140,7 +136,7 @@ class _GraphPainterState extends State<GraphPainter> {
     if (widget.mode == GraphMode.grid) {
       offsets = generateGridPoints(
         canvasSize: widget.size,
-        cellSize: widget.size * 0.2,
+        cellSize: widget.size * cellSizeFraction,
       );
     } else if (widget.mode == GraphMode.circle) {
       offsets = generateCircularOffsets(
@@ -162,8 +158,11 @@ class _GraphPainterState extends State<GraphPainter> {
     if (nodes.isEmpty) throw Exception('Nodes not generated!');
     if (widget.mode == GraphMode.grid) {
       // ---- Build grid edges (8-neighbor connectivity) ----
-      final cols = (widget.size.width / (widget.size.width * 0.2)).floor();
-      final rows = (widget.size.height / (widget.size.height * 0.2)).floor();
+      final cols = (widget.size.width / (widget.size.width * cellSizeFraction))
+          .floor();
+      final rows =
+          (widget.size.height / (widget.size.height * cellSizeFraction))
+              .floor();
       // 8-neighborhood, but only the half that points "forward":
       // rule: dr > 0 OR (dr == 0 && dc > 0)
       const dirs = <(int dr, int dc)>[
@@ -215,18 +214,22 @@ class _GraphPainterState extends State<GraphPainter> {
   }
 
   void _onHover(PointerHoverEvent event) {
-    //
+    final offset = event.localPosition;
+    final hoveredNodeIndex = nodes.indexWhere(
+      (node) => isWithinRadius(node.offset, offset, nodeRadius),
+    );
+    if (hoveredNodeIndex < 0 && _hoveredNodeIndex == hoveredNodeIndex) return;
     setState(() {
-      _hoverOffset = event.localPosition;
+      _hoveredNodeIndex = hoveredNodeIndex;
     });
   }
 
   void _onExit(_) {
-    if (_hoverOffset != null) {
-      setState(() {
-        _hoverOffset = null;
-      });
-    }
+    if (_hoverOffset == null && _hoveredNodeIndex < 0) return;
+    setState(() {
+      _hoverOffset = null;
+      _hoveredNodeIndex = -1;
+    });
   }
 
   void _onPanEnd(_) {
@@ -283,15 +286,17 @@ class _GraphPainterState extends State<GraphPainter> {
         onPanUpdate: _onPanUpdate,
         onPanEnd: _onPanEnd,
         behavior: HitTestBehavior.opaque,
-        child: ColoredBox(
-          color: Colors.red.withAlpha(0),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.white.withAlpha(50))
+          ),
           child: CustomPaint(
             painter: PlaygroundPainter(
               nodes: nodes,
               edges: edges,
               adjacencyList: adjacencyList,
               hoverOffset: _hoverOffset,
-              hoveredNodeIndex: hoveredNodeIndex,
+              hoveredNodeIndex: _hoveredNodeIndex,
               selectedNodeIndex: _selectedNodeIndex,
             ),
             child: Container(),

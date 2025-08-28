@@ -19,17 +19,32 @@ List<Offset> generateGridPoints({
   required Size canvasSize,
   required Size cellSize,
 }) {
-  assert(cellSize < canvasSize);
+  assert(
+    cellSize.width < canvasSize.width && cellSize.height < canvasSize.height,
+  );
+
   final list = <Offset>[];
   final cols = (canvasSize.width / cellSize.width).floor();
   final rows = (canvasSize.height / cellSize.height).floor();
+
+  // Calculate total occupied size of the grid
+  final gridWidth = cols * cellSize.width;
+  final gridHeight = rows * cellSize.height;
+
+  // Calculate padding to center the grid
+  final offsetX = (canvasSize.width - gridWidth) / 2;
+  final offsetY = (canvasSize.height - gridHeight) / 2;
+
   for (int i = 0; i < cols * rows; i++) {
     final col = i % cols;
     final row = i ~/ cols;
-    final centerX = col * cellSize.width + cellSize.width / 2;
-    final centerY = row * cellSize.height + cellSize.height / 2;
+
+    final centerX = offsetX + col * cellSize.width + cellSize.width / 2;
+    final centerY = offsetY + row * cellSize.height + cellSize.height / 2;
+
     list.add(Offset(centerX, centerY));
   }
+
   return list;
 }
 
