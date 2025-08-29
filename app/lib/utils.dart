@@ -121,7 +121,7 @@ bool isWithinRadius(Offset origin, Offset target, double radius) {
   return (target - origin).distance <= radius;
 }
 
-void drawArrow(
+void paintArrow(
   Canvas canvas,
   Offset p1,
   Offset p2,

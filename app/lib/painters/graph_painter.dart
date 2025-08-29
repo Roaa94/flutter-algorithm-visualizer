@@ -54,7 +54,7 @@ class GraphPainter extends CustomPainter {
     for (final node in graph.nodes) {
       if (node.previousNode != null) {
         // Draw arrow from previous to current node
-        drawArrow(
+        paintArrow(
           canvas,
           node.previousNode!.offset,
           node.offset,
