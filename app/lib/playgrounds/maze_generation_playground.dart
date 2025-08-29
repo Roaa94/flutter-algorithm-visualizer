@@ -70,7 +70,7 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
   }
 
   void _tick() {
-    final isCompleted = _algorithm.step();
+    final isCompleted = _algorithm.traverseStep();
     if (isCompleted) {
       //
     }

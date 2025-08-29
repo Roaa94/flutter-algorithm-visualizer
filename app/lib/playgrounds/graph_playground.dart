@@ -79,7 +79,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
   }
 
   void _tick() {
-    final isCompleted = _algorithm.step();
+    final isCompleted = _algorithm.traverseStep();
     if (isCompleted) {
       _paintEdges = false;
     }

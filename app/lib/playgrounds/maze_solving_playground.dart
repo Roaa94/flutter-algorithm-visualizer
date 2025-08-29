@@ -69,13 +69,13 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
   }
 
   void _tick() {
-    final isCompleted = _algorithm.step();
+    final isCompleted = _algorithm.findStep(_mazeGraph.nodes.length - 1);
     if (isCompleted) {
       //
     }
   }
 
-  void _initMaze() {
+  void _initGraph() {
     final mazeGenerationGraphBuilder = GraphBuilder(
       mode: GraphMode.grid,
       size: widget.size,
@@ -88,6 +88,9 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
       nodes: nodes,
       edges: edges,
     );
+  }
+
+  void _buildMaze() {
     _mazeGraph = DFS(_originalGraph).execute();
   }
 
@@ -108,13 +111,16 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
     setState(() {});
   }
 
-  void _onReset() {
+  void _onReset({bool resetOriginalGraph = true}) {
     if (_ticker.isActive) {
       _ticker.stop(canceled: true);
     }
     _elapsed = Duration.zero;
     _lastElapsed = null;
-    _initMaze();
+    if (resetOriginalGraph) {
+      _initGraph();
+    }
+    _buildMaze();
     _initAlgorithm();
     setState(() {});
   }
@@ -129,7 +135,7 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
     setState(() {
       _selectedAlgorithm = algorithm;
     });
-    _onReset();
+    _onReset(resetOriginalGraph: false);
   }
 
   void _onCellSizeChanged(double value) {
@@ -143,7 +149,8 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
   void initState() {
     super.initState();
     _ticker = createTicker(_onTick);
-    _initMaze();
+    _initGraph();
+    _buildMaze();
     _initAlgorithm();
   }
 
@@ -247,6 +254,10 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
               ElevatedButton(
                 onPressed: _onReset,
                 child: Text('Regenerate maze'),
+              ),
+              ElevatedButton(
+                onPressed: () => _onReset(resetOriginalGraph: false),
+                child: Text('Reset solver'),
               ),
               Flexible(
                 child: SizedBox(

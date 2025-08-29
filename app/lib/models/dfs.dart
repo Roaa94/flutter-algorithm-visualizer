@@ -15,7 +15,7 @@ class DFS extends Algorithm {
   late final Random _random;
 
   @override
-  bool step() {
+  bool traverseStep() {
     if (activeNodeIndex < 0) return true;
     graph.nodes[activeNodeIndex] = graph.nodes[activeNodeIndex].copyWith(
       isVisited: true,
@@ -23,6 +23,39 @@ class DFS extends Algorithm {
     final nextIndex = randomized
         ? graph.getRandomUnvisitedNeighbor(activeNodeIndex, _random)
         : graph.getNextUnvisitedNeighbor(activeNodeIndex);
+    if (nextIndex >= 0) {
+      // There are still unvisited neighbors
+      graph.nodes[nextIndex] = graph.nodes[nextIndex].copyWith(
+        isVisited: true,
+        previousNode: graph.nodes[activeNodeIndex],
+      );
+      stack.add(activeNodeIndex);
+      activeNodeIndex = nextIndex;
+    } else if (stack.isNotEmpty) {
+      // No neighbors left to visit
+      activeNodeIndex = stack.removeLast();
+    } else {
+      // DFS completed
+      activeNodeIndex = -1;
+      return true;
+    }
+    return false;
+  }
+
+  @override
+  bool findStep(int targetNodeIndex) {
+    if (activeNodeIndex < 0) return true;
+
+    if (activeNodeIndex == targetNodeIndex) {
+      // Found!
+      activeNodeIndex = -1;
+      return true;
+    }
+
+    graph.nodes[activeNodeIndex] = graph.nodes[activeNodeIndex].copyWith(
+      isVisited: true,
+    );
+    final nextIndex = graph.getNextUnvisitedNeighbor(activeNodeIndex);
     if (nextIndex >= 0) {
       // There are still unvisited neighbors
       graph.nodes[nextIndex] = graph.nodes[nextIndex].copyWith(

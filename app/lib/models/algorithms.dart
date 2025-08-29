@@ -79,7 +79,9 @@ abstract class Algorithm {
   List<int> stack = [];
   int activeNodeIndex = 0;
 
-  bool step();
+  bool traverseStep();
+
+  bool findStep(int targetNodeIndex);
 
   Graph execute();
 }

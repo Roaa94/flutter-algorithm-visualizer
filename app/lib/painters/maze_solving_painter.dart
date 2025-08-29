@@ -40,20 +40,23 @@ class MazeSolvingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (showMazeCells) {
-      for (final node in originalGraph.nodes) {
-        if (node.previousNode != null) {
-          canvas.drawLine(
-            node.previousNode!.offset,
-            node.offset,
-            Paint()
-              ..color = Colors.white
-              ..style = PaintingStyle.stroke
-              ..strokeWidth = cellSize / 2,
-          );
-        }
+      for (final edge in mazeGraph.edges) {
+        final start = mazeGraph.nodes[edge.first];
+        final end = mazeGraph.nodes[edge.last];
+
+        final isVisited = end.previousNode == start;
+
+        canvas.drawLine(
+          start.offset,
+          end.offset,
+          Paint()
+            ..color = isVisited ? secondaryColor : Colors.white
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = cellSize / 2,
+        );
       }
 
-      for (final (index, node) in originalGraph.nodes.indexed) {
+      for (final (index, node) in mazeGraph.nodes.indexed) {
         bool isCurrent = activeNodeIndex == index;
 
         bool active = isCurrent;
@@ -66,8 +69,8 @@ class MazeSolvingPainter extends CustomPainter {
             ..color = active
                 ? activeColor
                 : node.isVisited
-                ? Colors.white
-                : Colors.transparent,
+                ? secondaryColor
+                : Colors.white,
         );
       }
     }
