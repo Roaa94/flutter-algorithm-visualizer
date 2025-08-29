@@ -8,7 +8,7 @@ abstract class AlgorithmType {
 
   final String label;
 
-  Algorithm getAlgorithm(Graph graph, {bool randomized = true});
+  GraphAlgorithm getAlgorithm(Graph graph, {bool randomized = true});
 }
 
 enum GraphTraversalAlgorithmType implements AlgorithmType {
@@ -21,7 +21,7 @@ enum GraphTraversalAlgorithmType implements AlgorithmType {
   final String label;
 
   @override
-  Algorithm getAlgorithm(Graph graph, {bool randomized = true}) {
+  GraphAlgorithm getAlgorithm(Graph graph, {bool randomized = true}) {
     switch (this) {
       case dfs:
         return DFS(graph, randomized: randomized);
@@ -40,7 +40,7 @@ enum MazeGenerationAlgorithmType implements AlgorithmType {
   final String label;
 
   @override
-  Algorithm getAlgorithm(Graph graph, {bool randomized = true}) {
+  GraphAlgorithm getAlgorithm(Graph graph, {bool randomized = true}) {
     switch (this) {
       case dfs:
         return DFS(graph, randomized: randomized);
@@ -58,7 +58,7 @@ enum MazeSolvingAlgorithmType implements AlgorithmType {
   final String label;
 
   @override
-  Algorithm getAlgorithm(Graph graph, {bool randomized = true}) {
+  GraphAlgorithm getAlgorithm(Graph graph, {bool randomized = true}) {
     switch (this) {
       case dfs:
         return DFS(graph, randomized: randomized);
@@ -68,8 +68,8 @@ enum MazeSolvingAlgorithmType implements AlgorithmType {
   }
 }
 
-abstract class Algorithm {
-  Algorithm(
+abstract class GraphAlgorithm {
+  GraphAlgorithm(
     this.graph, {
     this.randomized = true,
   });
@@ -79,9 +79,23 @@ abstract class Algorithm {
   List<int> stack = [];
   int activeNodeIndex = 0;
 
-  bool traverseStep();
+  bool traverseStep() {
+    if (activeNodeIndex < 0) return true;
 
-  bool findStep(int targetNodeIndex);
+    return step();
+  }
+
+  bool findStep(int targetNodeIndex) {
+    if (activeNodeIndex < 0) return true;
+
+    if (activeNodeIndex == targetNodeIndex) {
+      // Found!
+      activeNodeIndex = -1;
+      return true;
+    }
+
+    return step();
+  }
 
   bool step();
 

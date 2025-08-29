@@ -30,7 +30,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
   int _nodesCount = 10;
   double _nodesRadius = 20;
 
-  late Algorithm _algorithm;
+  late GraphAlgorithm _algorithm;
 
   GraphMode _mode = GraphMode.grid;
   bool _paintEdges = true;

@@ -24,7 +24,7 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
     with SingleTickerProviderStateMixin {
   int _desiredFrameRate = 20;
   MazeSolvingAlgorithmType _selectedAlgorithm = MazeSolvingAlgorithmType.dfs;
-  late Algorithm _algorithm;
+  late GraphAlgorithm _algorithm;
 
   double _cellSizeFraction = 0.1;
   bool _showOriginalGraph = false;

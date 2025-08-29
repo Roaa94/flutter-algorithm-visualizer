@@ -5,7 +5,7 @@ import 'package:app/models/graph.dart';
 import 'package:app/models/node.dart';
 import 'package:app/utils.dart';
 
-class DFS extends Algorithm {
+class DFS extends GraphAlgorithm {
   DFS(
     super.graph, {
     super.randomized,
@@ -13,26 +13,6 @@ class DFS extends Algorithm {
   }) : _random = random ?? Random();
 
   late final Random _random;
-
-  @override
-  bool traverseStep() {
-    if (activeNodeIndex < 0) return true;
-
-    return step();
-  }
-
-  @override
-  bool findStep(int targetNodeIndex) {
-    if (activeNodeIndex < 0) return true;
-
-    if (activeNodeIndex == targetNodeIndex) {
-      // Found!
-      activeNodeIndex = -1;
-      return true;
-    }
-
-    return step();
-  }
 
   @override
   bool step() {
