@@ -1,4 +1,3 @@
-import 'package:app/models/a_star.dart';
 import 'package:app/models/bfs.dart';
 import 'package:app/models/dfs.dart';
 
@@ -25,8 +24,7 @@ enum AlgorithmMemoryType {
 
 enum GraphTraversalAlgorithmType implements AlgorithmType {
   dfs('DFS'),
-  bfs('BFS'),
-  aStar('A*');
+  bfs('BFS');
 
   const GraphTraversalAlgorithmType(this.label);
 
@@ -40,8 +38,6 @@ enum GraphTraversalAlgorithmType implements AlgorithmType {
         return DFS(graph, randomized: randomized);
       case bfs:
         return BFS(graph, randomized: false);
-      case aStar:
-        return AStar(graph);
     }
   }
 
@@ -51,8 +47,6 @@ enum GraphTraversalAlgorithmType implements AlgorithmType {
         return AlgorithmMemoryType.stack;
       case bfs:
         return AlgorithmMemoryType.queue;
-      case aStar:
-        return AlgorithmMemoryType.openSet;
     }
   }
 }
@@ -137,7 +131,6 @@ abstract class GraphAlgorithm {
     if (activeNodeIndex == targetNodeIndex) {
       // Found!
       activeNodeIndex = -1;
-      // Todo: allow custom start
       return generatePathFromParents(
         graph.nodes,
         startingNodeIndex ?? 0,
