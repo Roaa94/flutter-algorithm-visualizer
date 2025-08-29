@@ -9,18 +9,18 @@ class MazeGenerationPainter extends CustomPainter {
     this.graphView = true,
     this.mazeView = true,
     required this.cellSize,
+    required this.nodeRadius,
   });
 
   final Graph graph;
   final bool graphView;
   final bool mazeView;
   final double cellSize;
+  final double nodeRadius;
 
   static const primaryColor = Colors.red;
   static const activeColor = Colors.pink;
   static const secondaryColor = Colors.blue;
-
-  double get nodeRadius => cellSize / 4 * 0.6;
 
   final linePaint = Paint()
     ..style = PaintingStyle.stroke

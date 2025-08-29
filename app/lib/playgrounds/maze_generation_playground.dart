@@ -23,11 +23,16 @@ class MazeGenerationPlayground extends StatefulWidget {
 
 class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
     with SingleTickerProviderStateMixin {
-  int _desiredFrameRate = 2;
+  int _desiredFrameRate = 20;
   MazeGenerationAlgorithm _algorithm = MazeGenerationAlgorithm.dfs;
-  double _cellSizeFraction = 0.18;
-  double _nodesRadius = 20;
+  double _cellSizeFraction = 0.08;
   bool _graphView = true;
+
+  Size get cellSize => Size(
+    widget.size.width * _cellSizeFraction,
+    widget.size.width * _cellSizeFraction,
+  );
+  double get nodeRadius => cellSize.width / 4 * 0.6;
 
   late final Ticker _ticker;
   Duration _elapsed = Duration.zero;
@@ -64,10 +69,7 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
   void _initGraph() {
     _graph = Graph(
       size: widget.size,
-      cellSize: Size(
-        widget.size.width * _cellSizeFraction,
-        widget.size.width * _cellSizeFraction,
-      ),
+      cellSize: cellSize,
       hasDiagonalEdges: false,
       startingNodeIndex: _startingNodeIndex,
       mode: GraphMode.grid,
@@ -118,7 +120,7 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
   void _onTapDown(TapDownDetails details) {
     final offset = details.localPosition;
     final selectedNodeIndex = _graph.nodes.indexWhere(
-      (node) => isWithinRadius(node.offset, offset, _nodesRadius),
+      (node) => isWithinRadius(node.offset, offset, nodeRadius),
     );
     if (selectedNodeIndex < 0) return;
 
@@ -161,7 +163,8 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
                   graph: _graph,
                   graphView: _graphView,
                   mazeView: !_graphView,
-                  cellSize: widget.size.width * _cellSizeFraction,
+                  cellSize: cellSize.width,
+                  nodeRadius: nodeRadius,
                 ),
                 child: SizedBox(
                   width: widget.size.width,
