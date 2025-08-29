@@ -83,5 +83,7 @@ abstract class Algorithm {
 
   bool findStep(int targetNodeIndex);
 
+  bool step();
+
   Graph execute();
 }
