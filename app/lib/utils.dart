@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'models/node.dart';
+
 List<Offset> generateRandomPoints({
   required Random random,
   required Size canvasSize,
@@ -195,5 +197,33 @@ List<List<int>> generateGridEdges(
       }
     }
   }
+  return edges;
+}
+
+List<List<int>> generateEdgesFromNodeParents(List<Node> nodes) {
+  // Map each *exact* Node instance to its index (identity-based).
+  final indexOf = Map<Node, int>.identity();
+  for (var i = 0; i < nodes.length; i++) {
+    indexOf[nodes[i]] = i;
+  }
+
+  final edges = <List<int>>[];
+  final seen = <String>{}; // "u,v" keys to avoid duplicates
+
+  for (var v = 0; v < nodes.length; v++) {
+    final prev = nodes[v].previousNode;
+    if (prev == null) continue;
+
+    // Parent index via identity map (fast, exact). Fallback to .indexOf if needed.
+    final u = indexOf[prev] ?? nodes.indexOf(prev);
+    if (u < 0) continue; // parent not found in this list, skip
+
+    // Directed edge: parent -> child
+    final key = '$u,$v';
+    if (seen.add(key)) {
+      edges.add([u, v]);
+    }
+  }
+
   return edges;
 }

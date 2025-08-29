@@ -3,6 +3,7 @@ import 'package:app/widgets/custom_radio_group.dart';
 import 'package:flutter/material.dart';
 
 import 'graph_playground.dart';
+import 'maze_solving_playground.dart';
 
 enum Playground {
   graph('Graph'),
@@ -24,7 +25,7 @@ enum Playground {
           size: canvasSize,
         );
       case mazeSolving:
-        return MazeGenerationPlayground(
+        return MazeSolvingPlayground(
           size: canvasSize,
         );
     }
@@ -39,7 +40,7 @@ class PlaygroundPage extends StatefulWidget {
 }
 
 class _PlaygroundPageState extends State<PlaygroundPage> {
-  Playground _selectedPlayground = Playground.graph;
+  Playground _selectedPlayground = Playground.mazeSolving;
 
   @override
   Widget build(BuildContext context) {

@@ -3,14 +3,24 @@ import 'package:app/models/dfs.dart';
 
 import 'graph.dart';
 
-enum GraphTraversalAlgorithm {
-  dfs('DFS'),
-  bfs('BFS');
-
-  const GraphTraversalAlgorithm(this.label);
+abstract class AlgorithmType {
+  const AlgorithmType(this.label);
 
   final String label;
 
+  Algorithm getAlgorithm(Graph graph, {bool randomized = true});
+}
+
+enum GraphTraversalAlgorithmType implements AlgorithmType {
+  dfs('DFS'),
+  bfs('BFS');
+
+  const GraphTraversalAlgorithmType(this.label);
+
+  @override
+  final String label;
+
+  @override
   Algorithm getAlgorithm(Graph graph, {bool randomized = true}) {
     switch (this) {
       case dfs:
@@ -21,17 +31,39 @@ enum GraphTraversalAlgorithm {
   }
 }
 
-enum MazeGenerationAlgorithm {
+enum MazeGenerationAlgorithmType implements AlgorithmType {
   dfs('DFS');
 
-  const MazeGenerationAlgorithm(this.label);
+  const MazeGenerationAlgorithmType(this.label);
 
+  @override
   final String label;
 
+  @override
   Algorithm getAlgorithm(Graph graph, {bool randomized = true}) {
     switch (this) {
       case dfs:
         return DFS(graph, randomized: randomized);
+    }
+  }
+}
+
+enum MazeSolvingAlgorithmType implements AlgorithmType {
+  dfs('DFS'),
+  bfs('BFS');
+
+  const MazeSolvingAlgorithmType(this.label);
+
+  @override
+  final String label;
+
+  @override
+  Algorithm getAlgorithm(Graph graph, {bool randomized = true}) {
+    switch (this) {
+      case dfs:
+        return DFS(graph, randomized: randomized);
+      case bfs:
+        return BFS(graph, randomized: randomized);
     }
   }
 }
@@ -48,4 +80,6 @@ abstract class Algorithm {
   int activeNodeIndex = 0;
 
   bool step();
+
+  Graph execute();
 }

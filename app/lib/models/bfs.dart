@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:app/models/graph.dart';
+
 import 'algorithms.dart';
 
 class BFS extends Algorithm {
@@ -54,5 +56,11 @@ class BFS extends Algorithm {
       }
     }
     return false;
+  }
+
+  @override
+  Graph execute() {
+    // TODO: implement execute
+    throw UnimplementedError();
   }
 }
