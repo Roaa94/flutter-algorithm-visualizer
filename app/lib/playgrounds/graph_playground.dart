@@ -237,6 +237,12 @@ class _GraphPlaygroundState extends State<GraphPlayground>
   }
 
   @override
+  void dispose() {
+    _ticker.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(

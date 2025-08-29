@@ -145,6 +145,12 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
   }
 
   @override
+  void dispose() {
+    _ticker.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
