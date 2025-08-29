@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:app/models/algorithms.dart';
 import 'package:app/models/dfs.dart';
 import 'package:app/models/graph.dart';
 import 'package:app/models/graph_builder.dart';
 import 'package:app/painters/maze_solving_painter.dart';
+import 'package:app/utils.dart';
 import 'package:app/widgets/custom_radio_group.dart';
 import 'package:app/widgets/slider_tile.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +29,10 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
   MazeSolvingAlgorithmType _selectedAlgorithm = MazeSolvingAlgorithmType.dfs;
   late GraphAlgorithm _algorithm;
   List<int>? _mazeSolutionPath;
+
+  int _startingNodeIndex = 0;
+  bool _selectingStart = true;
+  int _endingNodeIndex = -1;
 
   double _cellSizeFraction = 0.1;
   bool _showOriginalGraph = false;
@@ -70,15 +77,31 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
   }
 
   void _tick() {
-    // Todo: allow custom start & end
-    final path = _algorithm.findStep(_mazeGraph.nodes.length - 1);
+    final path = _algorithm.findStep(_endingNodeIndex);
     if (path != null && path.isNotEmpty) {
       // A path was found!
-      print('path: $path');
+      log('Maze solution: $path');
       setState(() {
         _mazeSolutionPath = path;
       });
     }
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    if(_ticker.isActive) return;
+    final offset = details.localPosition;
+    final selectedNodeIndex = _mazeGraph.nodes.indexWhere(
+      (node) => isWithinRadius(node.offset, offset, nodeRadius),
+    );
+    if (selectedNodeIndex < 0) return;
+    if (_selectingStart) {
+      _startingNodeIndex = selectedNodeIndex;
+      _initAlgorithm();
+    } else {
+      _endingNodeIndex = selectedNodeIndex;
+    }
+    _selectingStart = !_selectingStart;
+    setState(() {});
   }
 
   void _initGraph() {
@@ -98,12 +121,14 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
 
   void _buildMaze() {
     _mazeGraph = DFS(_originalGraph).execute();
+    _endingNodeIndex = _mazeGraph.nodes.length - 1;
   }
 
   void _initAlgorithm() {
     _algorithm = _selectedAlgorithm.getAlgorithm(
       _mazeGraph,
-      randomized: true,
+      randomized: false,
+      startingNodeIndex: _startingNodeIndex,
     );
   }
 
@@ -124,6 +149,8 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
     _elapsed = Duration.zero;
     _lastElapsed = null;
     _mazeSolutionPath = null;
+    _startingNodeIndex = 0;
+    _selectingStart = true;
     if (resetOriginalGraph) {
       _initGraph();
     }
@@ -179,29 +206,34 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
   Widget build(BuildContext context) {
     return Center(
       child: Column(
-        spacing: 20,
+        spacing: 10,
         mainAxisSize: MainAxisSize.min,
         children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white.withAlpha(50)),
-            ),
-            child: CustomPaint(
-              painter: MazeSolvingPainter(
-                originalGraph: _originalGraph,
-                mazeGraph: _mazeGraph,
-                showOriginalGraph: _showOriginalGraph,
-                showMazeCells: _showMazeCells,
-                showMazeGraph: _showMazeGraph,
-                cellSize: cellSize.width,
-                nodeRadius: nodeRadius,
-                activeNodeIndex: _algorithm.activeNodeIndex,
-                stack: _algorithm.stack,
-                mazeSolutionPath: _mazeSolutionPath
+          GestureDetector(
+            onTapDown: _onTapDown,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white.withAlpha(50)),
               ),
-              child: SizedBox(
-                width: widget.size.width,
-                height: widget.size.height,
+              child: CustomPaint(
+                painter: MazeSolvingPainter(
+                  originalGraph: _originalGraph,
+                  mazeGraph: _mazeGraph,
+                  showOriginalGraph: _showOriginalGraph,
+                  showMazeCells: _showMazeCells,
+                  showMazeGraph: _showMazeGraph,
+                  cellSize: cellSize.width,
+                  nodeRadius: nodeRadius,
+                  activeNodeIndex: _algorithm.activeNodeIndex,
+                  stack: _algorithm.stack,
+                  mazeSolutionPath: _mazeSolutionPath,
+                  startingNodeIndex: _startingNodeIndex,
+                  endingNodeIndex: _endingNodeIndex,
+                ),
+                child: SizedBox(
+                  width: widget.size.width,
+                  height: widget.size.height,
+                ),
               ),
             ),
           ),

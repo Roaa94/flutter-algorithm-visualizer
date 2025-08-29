@@ -24,7 +24,7 @@ class GraphPlayground extends StatefulWidget {
 
 class _GraphPlaygroundState extends State<GraphPlayground>
     with SingleTickerProviderStateMixin {
-  int _desiredFrameRate = 2;
+  int _desiredFrameRate = 10;
   GraphTraversalAlgorithmType _selectedAlgorithm = GraphTraversalAlgorithmType.dfs;
   double _cellSizeFraction = 0.18;
   int _nodesCount = 10;

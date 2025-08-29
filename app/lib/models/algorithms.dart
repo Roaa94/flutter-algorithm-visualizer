@@ -59,12 +59,24 @@ enum MazeSolvingAlgorithmType implements AlgorithmType {
   final String label;
 
   @override
-  GraphAlgorithm getAlgorithm(Graph graph, {bool randomized = false}) {
+  GraphAlgorithm getAlgorithm(
+    Graph graph, {
+    bool randomized = false,
+    int? startingNodeIndex,
+  }) {
     switch (this) {
       case dfs:
-        return DFS(graph, randomized: randomized);
+        return DFS(
+          graph,
+          randomized: randomized,
+          startingNodeIndex: startingNodeIndex,
+        );
       case bfs:
-        return BFS(graph, randomized: randomized);
+        return BFS(
+          graph,
+          randomized: randomized,
+          startingNodeIndex: startingNodeIndex,
+        );
     }
   }
 }
@@ -73,12 +85,15 @@ abstract class GraphAlgorithm {
   GraphAlgorithm(
     this.graph, {
     this.randomized = true,
-  });
+    this.startingNodeIndex = 0,
+  }) : activeNodeIndex = startingNodeIndex ?? 0;
 
   Graph graph;
   final bool randomized;
+  final int? startingNodeIndex;
+
+  late int activeNodeIndex;
   List<int> stack = [];
-  int activeNodeIndex = 0;
 
   bool traverseStep() {
     if (activeNodeIndex < 0) return true;
@@ -93,7 +108,11 @@ abstract class GraphAlgorithm {
       // Found!
       activeNodeIndex = -1;
       // Todo: allow custom start
-      return generatePathFromParents(graph.nodes, 0, targetNodeIndex);
+      return generatePathFromParents(
+        graph.nodes,
+        startingNodeIndex ?? 0,
+        targetNodeIndex,
+      );
     }
 
     step();

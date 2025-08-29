@@ -9,6 +9,7 @@ class DFS extends GraphAlgorithm {
   DFS(
     super.graph, {
     super.randomized,
+    super.startingNodeIndex,
     Random? random,
   }) : _random = random ?? Random();
 

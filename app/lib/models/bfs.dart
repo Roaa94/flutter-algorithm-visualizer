@@ -8,6 +8,7 @@ class BFS extends GraphAlgorithm {
   BFS(
     super.graph, {
     super.randomized,
+    super.startingNodeIndex,
     Random? random,
   }) : _random = random ?? Random();
 

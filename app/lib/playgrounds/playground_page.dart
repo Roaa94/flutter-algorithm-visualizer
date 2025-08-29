@@ -47,32 +47,31 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
     final canvasSize = MediaQuery.sizeOf(context) * 0.7;
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 50),
-        child: Column(
-          spacing: 10,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: SizedBox(
-                    width: 450,
-                    child: CustomRadioGroup<Playground>(
-                      items: Playground.values,
-                      onChanged: (p) => setState(() => _selectedPlayground = p),
-                      selectedItem: _selectedPlayground,
-                      labelBuilder: (p) => p.label,
-                    ),
+      body: Column(
+        spacing: 10,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 10),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: SizedBox(
+                  width: 450,
+                  child: CustomRadioGroup<Playground>(
+                    items: Playground.values,
+                    onChanged: (p) => setState(() => _selectedPlayground = p),
+                    selectedItem: _selectedPlayground,
+                    labelBuilder: (p) => p.label,
                   ),
                 ),
-              ],
-            ),
-            Expanded(
-              child: _selectedPlayground.getView(canvasSize),
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: _selectedPlayground.getView(canvasSize),
+          ),
+        ],
       ),
     );
   }

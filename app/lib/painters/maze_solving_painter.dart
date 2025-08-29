@@ -15,6 +15,8 @@ class MazeSolvingPainter extends CustomPainter {
     this.activeNodeIndex = -1,
     this.stack = const [],
     this.mazeSolutionPath,
+    required this.startingNodeIndex,
+    required this.endingNodeIndex,
   });
 
   final Graph originalGraph;
@@ -27,10 +29,14 @@ class MazeSolvingPainter extends CustomPainter {
   final int activeNodeIndex;
   final List<int> stack;
   final List<int>? mazeSolutionPath;
+  final int startingNodeIndex;
+  final int endingNodeIndex;
 
-  static const primaryColor = Colors.red;
+  static const primaryColor = Colors.blue;
   static const activeColor = Colors.pink;
   static const secondaryColor = Colors.yellow;
+  static const startColor = Colors.green;
+  static const endColor = Colors.red;
 
   final linePaint = Paint()
     ..style = PaintingStyle.stroke
@@ -46,7 +52,6 @@ class MazeSolvingPainter extends CustomPainter {
         final start = mazeGraph.nodes[edge.first];
         final end = mazeGraph.nodes[edge.last];
 
-        final isVisited = end.previousNode == start;
         final isSolutionEdge =
             mazeSolutionPath != null &&
             mazeSolutionPath!.contains(edge.first) &&
@@ -56,29 +61,69 @@ class MazeSolvingPainter extends CustomPainter {
           start.offset,
           end.offset,
           Paint()
-            ..color = isSolutionEdge
-                ? activeColor
-                : isVisited
-                ? secondaryColor
-                : Colors.white
+            ..color = isSolutionEdge ? activeColor : Colors.white
             ..style = PaintingStyle.stroke
             ..strokeWidth = cellSize / 2,
         );
+      }
+
+      for (final node in mazeGraph.nodes) {
+        if (node.previousNode != null) {
+          if (!node.isVisited || !node.previousNode!.isVisited) return;
+          // Draw arrow from previous to current node
+          canvas.drawLine(
+            node.previousNode!.offset,
+            node.offset,
+            Paint()
+              ..color = secondaryColor
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = cellSize / 2,
+          );
+        }
+      }
+
+      if (mazeSolutionPath != null) {
+        for (final edge in mazeGraph.edges) {
+          final start = mazeGraph.nodes[edge.first];
+          final end = mazeGraph.nodes[edge.last];
+
+          final isSolutionEdge =
+              mazeSolutionPath!.contains(edge.first) &&
+              mazeSolutionPath!.contains(edge.last);
+
+          if (isSolutionEdge) {
+            canvas.drawLine(
+              start.offset,
+              end.offset,
+              Paint()
+                ..color = activeColor
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = cellSize / 2,
+            );
+          }
+        }
       }
 
       for (final (index, node) in mazeGraph.nodes.indexed) {
         bool isCurrent = activeNodeIndex == index;
         bool isSolutionNode =
             mazeSolutionPath != null && mazeSolutionPath!.contains(index);
+        bool isStart = index == startingNodeIndex;
+        bool isEnd = index == endingNodeIndex;
 
         bool active = isCurrent || isSolutionNode;
+
         canvas.drawRect(
           Rect.fromCircle(
             center: node.offset,
             radius: cellSize / 4,
           ),
           cellPaint
-            ..color = active
+            ..color = isStart
+                ? startColor
+                : isEnd
+                ? endColor
+                : active
                 ? activeColor
                 : node.isVisited
                 ? secondaryColor
@@ -155,15 +200,46 @@ class MazeSolvingPainter extends CustomPainter {
         }
       }
 
+      if (mazeSolutionPath != null) {
+        for (final edge in mazeGraph.edges) {
+          final start = mazeGraph.nodes[edge.first].offset;
+          final end = mazeGraph.nodes[edge.last].offset;
+
+          final isSolutionEdge =
+              mazeSolutionPath!.contains(edge.first) &&
+              mazeSolutionPath!.contains(edge.last);
+          if (isSolutionEdge) {
+            paintArrow(
+              canvas,
+              start,
+              end,
+              nodeRadius,
+              nodeRadius * 0.2,
+              linePaint..color = activeColor,
+            );
+          }
+        }
+      }
+
       for (final (index, node) in mazeGraph.nodes.indexed) {
         bool isCurrent = activeNodeIndex == index;
         bool isInStack = stack.contains(index);
+
+        bool isStart = index == startingNodeIndex;
+        bool isEnd = index == endingNodeIndex;
+        bool isSolution =
+            mazeSolutionPath != null && mazeSolutionPath!.contains(index);
+        bool isActive = isCurrent || isSolution;
 
         canvas.drawCircle(
           node.offset,
           nodeRadius,
           nodePaint
-            ..color = isCurrent
+            ..color = isStart
+                ? startColor
+                : isEnd
+                ? endColor
+                : isActive
                 ? activeColor
                 : isInStack
                 ? primaryColor
