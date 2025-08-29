@@ -24,12 +24,14 @@ class SliderTile extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(label),
-        Slider(
-          padding: EdgeInsets.zero,
-          value: value.toDouble(),
-          min: min,
-          max: max,
-          onChanged: onChanged,
+        Flexible(
+          child: Slider(
+            padding: EdgeInsets.zero,
+            value: value.toDouble(),
+            min: min,
+            max: max,
+            onChanged: onChanged,
+          ),
         ),
       ],
     );
