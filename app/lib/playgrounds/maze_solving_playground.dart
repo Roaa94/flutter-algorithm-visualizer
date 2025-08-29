@@ -25,6 +25,7 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
   int _desiredFrameRate = 20;
   MazeSolvingAlgorithmType _selectedAlgorithm = MazeSolvingAlgorithmType.dfs;
   late GraphAlgorithm _algorithm;
+  List<int>? _mazeSolutionPath;
 
   double _cellSizeFraction = 0.1;
   bool _showOriginalGraph = false;
@@ -69,9 +70,14 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
   }
 
   void _tick() {
-    final isCompleted = _algorithm.findStep(_mazeGraph.nodes.length - 1);
-    if (isCompleted) {
-      //
+    // Todo: allow custom start & end
+    final path = _algorithm.findStep(_mazeGraph.nodes.length - 1);
+    if (path != null && path.isNotEmpty) {
+      // A path was found!
+      print('path: $path');
+      setState(() {
+        _mazeSolutionPath = path;
+      });
     }
   }
 
@@ -117,6 +123,7 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
     }
     _elapsed = Duration.zero;
     _lastElapsed = null;
+    _mazeSolutionPath = null;
     if (resetOriginalGraph) {
       _initGraph();
     }
@@ -190,6 +197,7 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
                 nodeRadius: nodeRadius,
                 activeNodeIndex: _algorithm.activeNodeIndex,
                 stack: _algorithm.stack,
+                mazeSolutionPath: _mazeSolutionPath
               ),
               child: SizedBox(
                 width: widget.size.width,
@@ -286,7 +294,7 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
               SliderTile(
                 label: 'Grid Cell Size',
                 value: _cellSizeFraction,
-                min: 0.02,
+                min: 0.015,
                 max: 0.5,
                 onChanged: _onCellSizeChanged,
               ),

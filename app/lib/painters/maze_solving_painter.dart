@@ -14,6 +14,7 @@ class MazeSolvingPainter extends CustomPainter {
     required this.nodeRadius,
     this.activeNodeIndex = -1,
     this.stack = const [],
+    this.mazeSolutionPath,
   });
 
   final Graph originalGraph;
@@ -25,6 +26,7 @@ class MazeSolvingPainter extends CustomPainter {
   final double nodeRadius;
   final int activeNodeIndex;
   final List<int> stack;
+  final List<int>? mazeSolutionPath;
 
   static const primaryColor = Colors.red;
   static const activeColor = Colors.pink;
@@ -45,12 +47,20 @@ class MazeSolvingPainter extends CustomPainter {
         final end = mazeGraph.nodes[edge.last];
 
         final isVisited = end.previousNode == start;
+        final isSolutionEdge =
+            mazeSolutionPath != null &&
+            mazeSolutionPath!.contains(edge.first) &&
+            mazeSolutionPath!.contains(edge.last);
 
         canvas.drawLine(
           start.offset,
           end.offset,
           Paint()
-            ..color = isVisited ? secondaryColor : Colors.white
+            ..color = isSolutionEdge
+                ? activeColor
+                : isVisited
+                ? secondaryColor
+                : Colors.white
             ..style = PaintingStyle.stroke
             ..strokeWidth = cellSize / 2,
         );
@@ -58,8 +68,10 @@ class MazeSolvingPainter extends CustomPainter {
 
       for (final (index, node) in mazeGraph.nodes.indexed) {
         bool isCurrent = activeNodeIndex == index;
+        bool isSolutionNode =
+            mazeSolutionPath != null && mazeSolutionPath!.contains(index);
 
-        bool active = isCurrent;
+        bool active = isCurrent || isSolutionNode;
         canvas.drawRect(
           Rect.fromCircle(
             center: node.offset,

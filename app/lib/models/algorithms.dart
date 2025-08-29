@@ -1,6 +1,7 @@
 import 'package:app/models/bfs.dart';
 import 'package:app/models/dfs.dart';
 
+import '../utils.dart';
 import 'graph.dart';
 
 abstract class AlgorithmType {
@@ -58,7 +59,7 @@ enum MazeSolvingAlgorithmType implements AlgorithmType {
   final String label;
 
   @override
-  GraphAlgorithm getAlgorithm(Graph graph, {bool randomized = true}) {
+  GraphAlgorithm getAlgorithm(Graph graph, {bool randomized = false}) {
     switch (this) {
       case dfs:
         return DFS(graph, randomized: randomized);
@@ -85,16 +86,18 @@ abstract class GraphAlgorithm {
     return step();
   }
 
-  bool findStep(int targetNodeIndex) {
-    if (activeNodeIndex < 0) return true;
+  List<int>? findStep(int targetNodeIndex) {
+    if (activeNodeIndex < 0) return null;
 
     if (activeNodeIndex == targetNodeIndex) {
       // Found!
       activeNodeIndex = -1;
-      return true;
+      // Todo: allow custom start
+      return generatePathFromParents(graph.nodes, 0, targetNodeIndex);
     }
 
-    return step();
+    step();
+    return null;
   }
 
   bool step();

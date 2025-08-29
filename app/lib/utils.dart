@@ -227,3 +227,48 @@ List<List<int>> generateEdgesFromNodeParents(List<Node> nodes) {
 
   return edges;
 }
+
+List<int>? generatePathFromParents(
+  List<Node> nodes,
+  int start,
+  int end, {
+  bool reversed = true,
+}) {
+  // Validate inputs
+  if (start < 0 || start >= nodes.length || end < 0 || end >= nodes.length) {
+    return null;
+  }
+
+  // Map each exact Node instance to its index (identity-based).
+  final indexOf = Map<Node, int>.identity();
+  for (var i = 0; i < nodes.length; i++) {
+    indexOf[nodes[i]] = i;
+  }
+
+  final reversedPath = <int>[];
+  final seen = Set<Node>.identity(); // guard against accidental cycles
+
+  Node? cur = nodes[end];
+  while (cur != null) {
+    // If the node isn't found in our list (different instance), bail.
+    final idx = indexOf[cur];
+    if (idx == null) return null;
+
+    reversedPath.add(idx);
+
+    // Reached the start — done.
+    if (idx == start) {
+      if (reversed) {
+        return reversedPath;
+      } else {
+        return reversedPath.reversed.toList();
+      }
+    }
+
+    // Detect cycles (shouldn't happen in a tree, but be defensive).
+    if (!seen.add(cur)) return null;
+
+    cur = cur.previousNode;
+  }
+  return null;
+}
