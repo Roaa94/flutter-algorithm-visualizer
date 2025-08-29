@@ -1,5 +1,6 @@
 import 'package:app/models/algorithms.dart';
-import 'package:app/models/graph.dart';
+import 'package:app/models/graph_.dart';
+import 'package:app/models/graph_builder.dart';
 import 'package:app/models/node.dart';
 import 'package:app/painters/graph_painter.dart';
 import 'package:app/utils.dart';
@@ -24,10 +25,12 @@ class GraphPlayground extends StatefulWidget {
 class _GraphPlaygroundState extends State<GraphPlayground>
     with SingleTickerProviderStateMixin {
   int _desiredFrameRate = 2;
-  GraphTraversalAlgorithm _algorithm = GraphTraversalAlgorithm.dfs;
+  GraphTraversalAlgorithm _selectedAlgorithm = GraphTraversalAlgorithm.dfs;
   double _cellSizeFraction = 0.18;
   int _nodesCount = 10;
   double _nodesRadius = 20;
+
+  late Algorithm _algorithm;
 
   GraphMode _mode = GraphMode.grid;
   bool _paintEdges = true;
@@ -36,6 +39,16 @@ class _GraphPlaygroundState extends State<GraphPlayground>
   late final Ticker _ticker;
   Duration _elapsed = Duration.zero;
   Duration? _lastElapsed;
+
+  Size get cellSize => widget.size * _cellSizeFraction;
+
+  GraphBuilder get graphBuilder => GraphBuilder(
+    mode: _mode,
+    size: widget.size,
+    cellSize: cellSize,
+    nodesCount: _nodesCount,
+    hasDiagonalEdges: _hasDiagonalEdges,
+  );
 
   Duration get _desiredFrameTime => Duration(
     milliseconds: (1000 / _desiredFrameRate).floor(),
@@ -66,22 +79,25 @@ class _GraphPlaygroundState extends State<GraphPlayground>
   }
 
   void _tick() {
-    final complete = _algorithm == GraphTraversalAlgorithm.dfs
-        ? _graph.dfsStep(randomized: true)
-        : _graph.bfsStep(randomized: false);
-    if (complete) {
+    final isCompleted = _algorithm.step();
+    if (isCompleted) {
       _paintEdges = false;
     }
   }
 
   void _initGraph() {
+    final nodes = graphBuilder.generateNodes();
+    final edges = graphBuilder.generateEdges(nodes);
     _graph = Graph(
-      size: widget.size,
-      nodesCount: _nodesCount,
-      cellSize: widget.size * _cellSizeFraction,
-      hasDiagonalEdges: _hasDiagonalEdges,
-      startingNodeIndex: _startingNodeIndex,
-      mode: _mode,
+      nodes: nodes,
+      edges: edges,
+    );
+  }
+
+  void _initAlgorithm() {
+    _algorithm = _selectedAlgorithm.getAlgorithm(
+      _graph,
+      randomized: true,
     );
   }
 
@@ -110,6 +126,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
     _paintEdges = true;
     _startingNodeIndex = null;
     _initGraph();
+    _initAlgorithm();
     setState(() {});
   }
 
@@ -128,7 +145,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
 
   void _onAlgorithmChanged(GraphTraversalAlgorithm algorithm) {
     setState(() {
-      _algorithm = algorithm;
+      _selectedAlgorithm = algorithm;
     });
     _onReset();
   }
@@ -152,10 +169,6 @@ class _GraphPlaygroundState extends State<GraphPlayground>
       _hasDiagonalEdges = !_hasDiagonalEdges;
     });
     _onReset();
-  }
-
-  void _onEnter(_) {
-    //
   }
 
   void _onHover(PointerHoverEvent event) {
@@ -192,7 +205,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
     if (selectedNodeIndex < 0) return;
 
     _startingNodeIndex = selectedNodeIndex;
-    _graph.activeNodeIndex = _startingNodeIndex!;
+    _algorithm.activeNodeIndex = _startingNodeIndex!;
     _selectedNodeIndex = selectedNodeIndex;
     setState(() {});
   }
@@ -212,6 +225,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
     super.initState();
     _ticker = createTicker(_onTick);
     _initGraph();
+    _initAlgorithm();
   }
 
   @override
@@ -250,6 +264,8 @@ class _GraphPlaygroundState extends State<GraphPlayground>
                     hoverOffset: _hoverOffset,
                     hoveredNodeIndex: _hoveredNodeIndex,
                     selectedNodeIndex: _selectedNodeIndex,
+                    activeNodeIndex: _algorithm.activeNodeIndex,
+                    stack: _algorithm.stack,
                   ),
                   child: SizedBox(
                     width: widget.size.width,
@@ -306,7 +322,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
                 child: SizedBox(
                   width: 250,
                   child: CustomRadioGroup<GraphTraversalAlgorithm>(
-                    selectedItem: _algorithm,
+                    selectedItem: _selectedAlgorithm,
                     items: GraphTraversalAlgorithm.values,
                     onChanged: _onAlgorithmChanged,
                     labelBuilder: (m) => m.label,
@@ -347,7 +363,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
                 },
               ),
               SliderTile(
-                label: 'Frames per second',
+                label: 'FPS',
                 value: _desiredFrameRate,
                 min: 1,
                 max: 60,

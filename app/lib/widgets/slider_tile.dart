@@ -23,7 +23,7 @@ class SliderTile extends StatelessWidget {
       spacing: 10,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(label),
+        Text('$label (${value.toStringAsFixed(1)})'),
         Flexible(
           child: Slider(
             padding: EdgeInsets.zero,

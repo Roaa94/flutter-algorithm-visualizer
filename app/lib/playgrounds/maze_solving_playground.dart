@@ -23,9 +23,9 @@ class MazeGenerationPlayground extends StatefulWidget {
 
 class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
     with SingleTickerProviderStateMixin {
-  int _desiredFrameRate = 20;
+  int _desiredFrameRate = 2;
   MazeGenerationAlgorithm _algorithm = MazeGenerationAlgorithm.dfs;
-  double _cellSizeFraction = 0.08;
+  double _cellSizeFraction = 0.18;
   bool _graphView = true;
 
   Size get cellSize => Size(
@@ -69,7 +69,10 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
   void _initGraph() {
     _graph = Graph(
       size: widget.size,
-      cellSize: cellSize,
+      cellSize: Size(
+        widget.size.width * _cellSizeFraction,
+        widget.size.width * _cellSizeFraction,
+      ),
       hasDiagonalEdges: false,
       startingNodeIndex: _startingNodeIndex,
       mode: GraphMode.grid,

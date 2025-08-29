@@ -1,7 +1,7 @@
 import 'package:app/utils.dart';
 import 'package:flutter/material.dart';
 
-import '../models/graph.dart';
+import '../models/graph_.dart';
 
 class GraphPainter extends CustomPainter {
   GraphPainter({
@@ -9,6 +9,8 @@ class GraphPainter extends CustomPainter {
     this.hoverOffset,
     this.hoveredNodeIndex = -1,
     this.selectedNodeIndex = -1,
+    this.activeNodeIndex = -1,
+    this.stack = const [],
     this.nodeRadius = 20,
     this.paintEdges = true,
   });
@@ -17,8 +19,10 @@ class GraphPainter extends CustomPainter {
   final Offset? hoverOffset;
   final int selectedNodeIndex;
   final int hoveredNodeIndex;
+  final int activeNodeIndex;
   final double nodeRadius;
   final bool paintEdges;
+  final List<int> stack;
 
   static const primaryColor = Colors.blue;
   static const activeColor = Colors.pink;
@@ -76,8 +80,8 @@ class GraphPainter extends CustomPainter {
           graph.adjacencyList[selectedNodeIndex].contains(
             index,
           );
-      bool isCurrent = graph.activeNodeIndex == index;
-      bool inStack = graph.stack.contains(index);
+      bool isCurrent = activeNodeIndex == index;
+      bool inStack = stack.contains(index);
 
       bool active = isSelected || isCurrent;
       bool secondary =
