@@ -34,12 +34,12 @@ class Graph {
   Graph({
     this.mode = GraphMode.grid,
     required this.size,
-    required this.nodesCount,
-    this.cellSizeFraction = 0.18,
+    this.nodesCount = 10,
     this.hasDiagonalEdges = true,
     this.startingNodeIndex,
+    required this.cellSize,
     Random? random,
-  }) : _random = random ?? Random() {
+  }) : _random = random ?? Random()  {
     _init();
   }
 
@@ -47,7 +47,7 @@ class Graph {
   final Size size;
   final int nodesCount;
   final int? startingNodeIndex;
-  final double cellSizeFraction;
+  final Size cellSize;
   final bool hasDiagonalEdges;
 
   late List<Node> nodes;
@@ -71,7 +71,7 @@ class Graph {
     if (mode == GraphMode.grid) {
       offsets = generateGridPoints(
         canvasSize: size,
-        cellSize: size * cellSizeFraction,
+        cellSize: cellSize,
       );
     } else if (mode == GraphMode.circle) {
       offsets = generateCircularOffsets(
@@ -96,7 +96,7 @@ class Graph {
     if (mode == GraphMode.grid) {
       edges = generateGridEdges(
         size,
-        cellSizeFraction,
+        cellSize,
         withDiagonals: hasDiagonalEdges,
       );
     } else {

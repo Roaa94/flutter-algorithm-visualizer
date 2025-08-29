@@ -48,6 +48,26 @@ List<Offset> generateGridPoints({
   return list;
 }
 
+// List<Offset> generateGridPointsByCounts({
+//   required Size canvasSize,
+//   required int cols,
+//   required int rows,
+// }) {
+//   final list = <Offset>[];
+//
+//   for (int i = 0; i < cols * rows; i++) {
+//     final col = i % cols;
+//     final row = i ~/ cols;
+//
+//     final centerX = col * cellSize + cellSize / 2;
+//     final centerY = offsetY + row * cellSize + cellSize / 2;
+//
+//     list.add(Offset(centerX, centerY));
+//   }
+//
+//   return list;
+// }
+
 List<Offset> generateCircularOffsets({
   required double radius,
   required int count,
@@ -140,17 +160,18 @@ void drawArrow(
     ..lineTo(right.dx, right.dy)
     ..close();
 
-  canvas.drawPath(path, paint);
+  canvas.drawPath(path, paint..style = PaintingStyle.fill);
+  canvas.drawPath(path, paint..style = PaintingStyle.stroke);
 }
 
 List<List<int>> generateGridEdges(
   Size size,
-  double cellSizeFraction, {
+  Size cellSize, {
   bool withDiagonals = true,
 }) {
   final edges = <List<int>>[];
-  final cols = (size.width / (size.width * cellSizeFraction)).floor();
-  final rows = (size.height / (size.height * cellSizeFraction)).floor();
+  final cols = (size.width / cellSize.width).floor();
+  final rows = (size.height / cellSize.height).floor();
   // 8-neighborhood, but only the half that points "forward":
   // rule: dr > 0 OR (dr == 0 && dc > 0)
   final dirs = <(int dr, int dc)>[

@@ -1,6 +1,5 @@
+import 'package:app/maze_visualizer.dart';
 import 'package:flutter/material.dart';
-
-import 'graph_visualizer.dart';
 
 class PlaygroundPage extends StatelessWidget {
   const PlaygroundPage({super.key});
@@ -8,7 +7,7 @@ class PlaygroundPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GraphVisualizer(
+      body: MazeVisualizer(
         size: MediaQuery.sizeOf(context) * 0.7,
       ),
     );

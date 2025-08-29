@@ -1,5 +1,6 @@
 import 'package:app/graph.dart';
 import 'package:app/graph_painter.dart';
+import 'package:app/slider_tile.dart';
 import 'package:app/utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -77,7 +78,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     _graph = Graph(
       size: widget.size,
       nodesCount: _nodesCount,
-      cellSizeFraction: _cellSizeFraction,
+      cellSize: widget.size * _cellSizeFraction,
       hasDiagonalEdges: _hasDiagonalEdges,
       startingNodeIndex: _startingNodeIndex,
       mode: _mode,
@@ -356,42 +357,6 @@ class _GraphVisualizerState extends State<GraphVisualizer>
           ),
         ],
       ),
-    );
-  }
-}
-
-class SliderTile extends StatelessWidget {
-  const SliderTile({
-    super.key,
-    required this.label,
-    this.value = 0,
-    this.min = 0,
-    required this.max,
-    required this.onChanged,
-  });
-
-  final String label;
-  final num value;
-  final double min;
-  final double max;
-
-  final ValueChanged<double> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      spacing: 10,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(label),
-        Slider(
-          padding: EdgeInsets.zero,
-          value: value.toDouble(),
-          min: min,
-          max: max,
-          onChanged: onChanged,
-        ),
-      ],
     );
   }
 }
