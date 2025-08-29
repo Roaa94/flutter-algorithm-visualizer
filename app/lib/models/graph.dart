@@ -5,9 +5,9 @@ import 'package:collection/collection.dart';
 import './node.dart';
 
 enum GraphMode {
+  free('Free'),
   grid('Grid'),
-  circle('Circle'),
-  random('Random');
+  circle('Circle');
 
   const GraphMode(this.label);
 

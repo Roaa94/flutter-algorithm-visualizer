@@ -225,7 +225,7 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
                   cellSize: cellSize.width,
                   nodeRadius: nodeRadius,
                   activeNodeIndex: _algorithm.activeNodeIndex,
-                  stack: _algorithm.stack,
+                  stack: _algorithm.memory,
                   mazeSolutionPath: _mazeSolutionPath,
                   startingNodeIndex: _startingNodeIndex,
                   endingNodeIndex: _endingNodeIndex,

@@ -29,11 +29,11 @@ class DFS extends GraphAlgorithm {
         isVisited: true,
         previousNode: graph.nodes[activeNodeIndex],
       );
-      stack.add(activeNodeIndex);
+      memory.add(activeNodeIndex);
       activeNodeIndex = nextIndex;
-    } else if (stack.isNotEmpty) {
+    } else if (memory.isNotEmpty) {
       // No neighbors left to visit
-      activeNodeIndex = stack.removeLast();
+      activeNodeIndex = memory.removeLast();
     } else {
       // DFS completed
       activeNodeIndex = -1;

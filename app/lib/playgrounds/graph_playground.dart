@@ -24,9 +24,10 @@ class GraphPlayground extends StatefulWidget {
 
 class _GraphPlaygroundState extends State<GraphPlayground>
     with SingleTickerProviderStateMixin {
-  int _desiredFrameRate = 10;
-  GraphTraversalAlgorithmType _selectedAlgorithm = GraphTraversalAlgorithmType.dfs;
-  double _cellSizeFraction = 0.18;
+  int _desiredFrameRate = 1;
+  GraphTraversalAlgorithmType _selectedAlgorithm =
+      GraphTraversalAlgorithmType.dfs;
+  double _cellSizeFraction = 0.25;
   int _nodesCount = 10;
   double _nodesRadius = 20;
 
@@ -123,7 +124,6 @@ class _GraphPlaygroundState extends State<GraphPlayground>
     }
     _elapsed = Duration.zero;
     _lastElapsed = null;
-    _paintEdges = true;
     _startingNodeIndex = null;
     _initGraph();
     _initAlgorithm();
@@ -249,36 +249,87 @@ class _GraphPlaygroundState extends State<GraphPlayground>
         spacing: 20,
         mainAxisSize: MainAxisSize.min,
         children: [
-          MouseRegion(
-            onHover: _onHover,
-            onExit: _onExit,
-            child: GestureDetector(
-              onPanDown: _onPanDown,
-              onPanUpdate: _onPanUpdate,
-              onPanEnd: _onPanEnd,
-              behavior: HitTestBehavior.opaque,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white.withAlpha(50)),
-                ),
-                child: CustomPaint(
-                  painter: GraphPainter(
-                    graph: _graph,
-                    nodeRadius: _nodesRadius,
-                    paintEdges: _paintEdges,
-                    hoverOffset: _hoverOffset,
-                    hoveredNodeIndex: _hoveredNodeIndex,
-                    selectedNodeIndex: _selectedNodeIndex,
-                    activeNodeIndex: _algorithm.activeNodeIndex,
-                    stack: _algorithm.stack,
-                  ),
-                  child: SizedBox(
-                    width: widget.size.width,
-                    height: widget.size.height,
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              MouseRegion(
+                onHover: _onHover,
+                onExit: _onExit,
+                child: GestureDetector(
+                  onPanDown: _onPanDown,
+                  onPanUpdate: _onPanUpdate,
+                  onPanEnd: _onPanEnd,
+                  behavior: HitTestBehavior.opaque,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white.withAlpha(50)),
+                    ),
+                    child: CustomPaint(
+                      painter: GraphPainter(
+                        graph: _graph,
+                        nodeRadius: _nodesRadius,
+                        paintEdges: _paintEdges,
+                        hoverOffset: _hoverOffset,
+                        hoveredNodeIndex: _hoveredNodeIndex,
+                        selectedNodeIndex: _selectedNodeIndex,
+                        activeNodeIndex: _algorithm.activeNodeIndex,
+                        stack: _algorithm.memory,
+                      ),
+                      child: SizedBox(
+                        width: widget.size.width,
+                        height: widget.size.height,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              Positioned(
+                left: widget.size.width,
+                bottom: 0,
+                width: 100,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children:
+                          (_selectedAlgorithm.memory ==
+                                      AlgorithmMemoryType.stack
+                                  ? _algorithm.memory.reversed
+                                  : _algorithm.memory)
+                              .map(
+                                (item) => Container(
+                                  padding: const EdgeInsets.all(2.0),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.white.withAlpha(50),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      item.toString(),
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(2.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.white.withAlpha(50),
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(_selectedAlgorithm.memory.label),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

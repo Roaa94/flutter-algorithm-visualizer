@@ -190,7 +190,7 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
                   cellSize: cellSize.width,
                   nodeRadius: nodeRadius,
                   activeNodeIndex: _algorithm.activeNodeIndex,
-                  stack: _algorithm.stack,
+                  stack: _algorithm.memory,
                 ),
                 child: SizedBox(
                   width: widget.size.width,

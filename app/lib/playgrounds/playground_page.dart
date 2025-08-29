@@ -40,7 +40,7 @@ class PlaygroundPage extends StatefulWidget {
 }
 
 class _PlaygroundPageState extends State<PlaygroundPage> {
-  Playground _selectedPlayground = Playground.mazeSolving;
+  Playground _selectedPlayground = Playground.graph;
 
   @override
   Widget build(BuildContext context) {

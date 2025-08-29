@@ -1,3 +1,4 @@
+import 'package:app/models/a_star.dart';
 import 'package:app/models/bfs.dart';
 import 'package:app/models/dfs.dart';
 
@@ -12,9 +13,20 @@ abstract class AlgorithmType {
   GraphAlgorithm getAlgorithm(Graph graph, {bool randomized = true});
 }
 
+enum AlgorithmMemoryType {
+  stack('Stack'),
+  queue('Queue'),
+  openSet('Open Set');
+
+  const AlgorithmMemoryType(this.label);
+
+  final String label;
+}
+
 enum GraphTraversalAlgorithmType implements AlgorithmType {
   dfs('DFS'),
-  bfs('BFS');
+  bfs('BFS'),
+  aStar('A*');
 
   const GraphTraversalAlgorithmType(this.label);
 
@@ -27,7 +39,20 @@ enum GraphTraversalAlgorithmType implements AlgorithmType {
       case dfs:
         return DFS(graph, randomized: randomized);
       case bfs:
-        return BFS(graph, randomized: randomized);
+        return BFS(graph, randomized: false);
+      case aStar:
+        return AStar(graph);
+    }
+  }
+
+  AlgorithmMemoryType get memory {
+    switch (this) {
+      case dfs:
+        return AlgorithmMemoryType.stack;
+      case bfs:
+        return AlgorithmMemoryType.queue;
+      case aStar:
+        return AlgorithmMemoryType.openSet;
     }
   }
 }
@@ -93,7 +118,12 @@ abstract class GraphAlgorithm {
   final int? startingNodeIndex;
 
   late int activeNodeIndex;
-  List<int> stack = [];
+
+  // Array of node indices stored by the algorithm
+  // For DFS => stack
+  // For BFS => queue
+  // For A* => openSet
+  List<int> memory = [];
 
   bool traverseStep() {
     if (activeNodeIndex < 0) return true;
