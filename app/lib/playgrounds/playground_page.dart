@@ -1,4 +1,4 @@
-import 'package:app/maze_visualizer.dart';
+import 'package:app/playgrounds/maze_generation_playground.dart';
 import 'package:flutter/material.dart';
 
 class PlaygroundPage extends StatelessWidget {
@@ -6,9 +6,10 @@ class PlaygroundPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final canvasSize = MediaQuery.sizeOf(context) * 0.7;
     return Scaffold(
-      body: MazeVisualizer(
-        size: MediaQuery.sizeOf(context) * 0.7,
+      body: MazeGenerationPlayground(
+        size: canvasSize,
       ),
     );
   }

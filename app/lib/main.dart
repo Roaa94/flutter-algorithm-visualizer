@@ -1,4 +1,4 @@
-import 'package:app/playground_page.dart';
+import 'package:app/playgrounds/playground_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {

@@ -1,14 +1,15 @@
-import 'package:app/graph.dart';
-import 'package:app/maze_painter.dart';
-import 'package:app/slider_tile.dart';
+import 'package:app/models/algorithms.dart';
+import 'package:app/models/graph.dart';
+import 'package:app/painters/maze_generation_painter.dart';
 import 'package:app/utils.dart';
+import 'package:app/widgets/slider_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import 'custom_radio_group.dart';
+import '../widgets/custom_radio_group.dart';
 
-class MazeVisualizer extends StatefulWidget {
-  const MazeVisualizer({
+class MazeGenerationPlayground extends StatefulWidget {
+  const MazeGenerationPlayground({
     required this.size,
     super.key,
   });
@@ -16,13 +17,14 @@ class MazeVisualizer extends StatefulWidget {
   final Size size;
 
   @override
-  State<MazeVisualizer> createState() => _MazeVisualizerState();
+  State<MazeGenerationPlayground> createState() =>
+      _MazeGenerationPlaygroundState();
 }
 
-class _MazeVisualizerState extends State<MazeVisualizer>
+class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
     with SingleTickerProviderStateMixin {
   int _desiredFrameRate = 2;
-  Algorithm _algorithm = Algorithm.dfs;
+  MazeGenerationAlgorithm _algorithm = MazeGenerationAlgorithm.dfs;
   double _cellSizeFraction = 0.18;
   double _nodesRadius = 20;
   bool _graphView = true;
@@ -52,7 +54,7 @@ class _MazeVisualizerState extends State<MazeVisualizer>
   }
 
   void _tick() {
-    if (_algorithm == Algorithm.dfs) {
+    if (_algorithm == MazeGenerationAlgorithm.dfs) {
       _graph.dfsStep(randomized: true);
     } else {
       _graph.bfsStep(randomized: true);
@@ -99,7 +101,7 @@ class _MazeVisualizerState extends State<MazeVisualizer>
     });
   }
 
-  void _onAlgorithmChanged(Algorithm algorithm) {
+  void _onAlgorithmChanged(MazeGenerationAlgorithm algorithm) {
     setState(() {
       _algorithm = algorithm;
     });
@@ -133,7 +135,7 @@ class _MazeVisualizerState extends State<MazeVisualizer>
   }
 
   @override
-  void didUpdateWidget(covariant MazeVisualizer oldWidget) {
+  void didUpdateWidget(covariant MazeGenerationPlayground oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.size != widget.size) {
       _onReset();
@@ -155,7 +157,7 @@ class _MazeVisualizerState extends State<MazeVisualizer>
                 border: Border.all(color: Colors.white.withAlpha(50)),
               ),
               child: CustomPaint(
-                painter: MazePainter(
+                painter: MazeGenerationPainter(
                   graph: _graph,
                   graphView: _graphView,
                   mazeView: !_graphView,
@@ -197,9 +199,9 @@ class _MazeVisualizerState extends State<MazeVisualizer>
               Flexible(
                 child: SizedBox(
                   width: 250,
-                  child: CustomRadioGroup<Algorithm>(
+                  child: CustomRadioGroup<MazeGenerationAlgorithm>(
                     selectedItem: _algorithm,
-                    items: Algorithm.values,
+                    items: MazeGenerationAlgorithm.values,
                     onChanged: _onAlgorithmChanged,
                     labelBuilder: (m) => m.label,
                   ),

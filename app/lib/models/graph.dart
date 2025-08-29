@@ -4,16 +4,7 @@ import 'dart:ui';
 import 'package:app/utils.dart';
 import 'package:collection/collection.dart';
 
-import 'node.dart';
-
-enum Algorithm {
-  dfs('DFS'),
-  bfs('BFS');
-
-  const Algorithm(this.label);
-
-  final String label;
-}
+import './node.dart';
 
 enum GraphMode {
   grid('Grid'),
@@ -39,7 +30,7 @@ class Graph {
     this.startingNodeIndex,
     required this.cellSize,
     Random? random,
-  }) : _random = random ?? Random()  {
+  }) : _random = random ?? Random() {
     _init();
   }
 

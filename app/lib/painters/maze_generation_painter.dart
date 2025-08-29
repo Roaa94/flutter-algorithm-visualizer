@@ -1,10 +1,10 @@
 import 'package:app/utils.dart';
 import 'package:flutter/material.dart';
 
-import 'graph.dart';
+import '../models/graph.dart';
 
-class MazePainter extends CustomPainter {
-  MazePainter({
+class MazeGenerationPainter extends CustomPainter {
+  MazeGenerationPainter({
     required this.graph,
     this.graphView = true,
     this.mazeView = true,
@@ -117,7 +117,7 @@ class MazePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant MazePainter oldDelegate) {
+  bool shouldRepaint(covariant MazeGenerationPainter oldDelegate) {
     return true;
   }
 }

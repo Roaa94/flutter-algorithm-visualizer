@@ -1,16 +1,16 @@
-import 'package:app/graph.dart';
-import 'package:app/graph_painter.dart';
-import 'package:app/slider_tile.dart';
+import 'package:app/models/algorithms.dart';
+import 'package:app/models/graph.dart';
+import 'package:app/models/node.dart';
+import 'package:app/painters/graph_painter.dart';
 import 'package:app/utils.dart';
+import 'package:app/widgets/custom_radio_group.dart';
+import 'package:app/widgets/slider_tile.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import 'custom_radio_group.dart';
-import 'node.dart';
-
-class GraphVisualizer extends StatefulWidget {
-  const GraphVisualizer({
+class GraphPlayground extends StatefulWidget {
+  const GraphPlayground({
     required this.size,
     super.key,
   });
@@ -18,13 +18,13 @@ class GraphVisualizer extends StatefulWidget {
   final Size size;
 
   @override
-  State<GraphVisualizer> createState() => _GraphVisualizerState();
+  State<GraphPlayground> createState() => _GraphPlaygroundState();
 }
 
-class _GraphVisualizerState extends State<GraphVisualizer>
+class _GraphPlaygroundState extends State<GraphPlayground>
     with SingleTickerProviderStateMixin {
   int _desiredFrameRate = 2;
-  Algorithm _algorithm = Algorithm.dfs;
+  GraphTraversalAlgorithm _algorithm = GraphTraversalAlgorithm.dfs;
   double _cellSizeFraction = 0.18;
   int _nodesCount = 10;
   double _nodesRadius = 20;
@@ -66,7 +66,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   }
 
   void _tick() {
-    final complete = _algorithm == Algorithm.dfs
+    final complete = _algorithm == GraphTraversalAlgorithm.dfs
         ? _graph.dfsStep(randomized: true)
         : _graph.bfsStep(randomized: false);
     if (complete) {
@@ -126,7 +126,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
     _onReset();
   }
 
-  void _onAlgorithmChanged(Algorithm algorithm) {
+  void _onAlgorithmChanged(GraphTraversalAlgorithm algorithm) {
     setState(() {
       _algorithm = algorithm;
     });
@@ -215,7 +215,7 @@ class _GraphVisualizerState extends State<GraphVisualizer>
   }
 
   @override
-  void didUpdateWidget(covariant GraphVisualizer oldWidget) {
+  void didUpdateWidget(covariant GraphPlayground oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.size != widget.size) {
       _onReset();
@@ -305,9 +305,9 @@ class _GraphVisualizerState extends State<GraphVisualizer>
               Flexible(
                 child: SizedBox(
                   width: 250,
-                  child: CustomRadioGroup<Algorithm>(
+                  child: CustomRadioGroup<GraphTraversalAlgorithm>(
                     selectedItem: _algorithm,
-                    items: Algorithm.values,
+                    items: GraphTraversalAlgorithm.values,
                     onChanged: _onAlgorithmChanged,
                     labelBuilder: (m) => m.label,
                   ),

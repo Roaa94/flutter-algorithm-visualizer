@@ -31,7 +31,9 @@ class CustomRadioGroup<T> extends StatelessWidget {
                       ? Colors.pink.shade100
                       : Colors.white,
                   border: Border.all(color: Colors.black),
-                  borderRadius: index == 0
+                  borderRadius: items.length == 1
+                      ? BorderRadius.circular(10)
+                      : index == 0
                       ? BorderRadius.only(
                           topLeft: Radius.circular(10),
                           bottomLeft: Radius.circular(10),
