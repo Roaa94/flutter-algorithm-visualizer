@@ -1,5 +1,5 @@
 import 'package:app/models/algorithms.dart';
-import 'package:app/models/graph_.dart';
+import 'package:app/models/graph.dart';
 import 'package:app/models/graph_builder.dart';
 import 'package:app/models/node.dart';
 import 'package:app/painters/graph_painter.dart';

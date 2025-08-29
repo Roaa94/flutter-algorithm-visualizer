@@ -10,6 +10,8 @@ class MazeGenerationPainter extends CustomPainter {
     this.mazeView = true,
     required this.cellSize,
     required this.nodeRadius,
+    this.activeNodeIndex = -1,
+    this.stack = const [],
   });
 
   final Graph graph;
@@ -17,6 +19,8 @@ class MazeGenerationPainter extends CustomPainter {
   final bool mazeView;
   final double cellSize;
   final double nodeRadius;
+  final int activeNodeIndex;
+  final List<int> stack;
 
   static const primaryColor = Colors.red;
   static const activeColor = Colors.pink;
@@ -46,7 +50,7 @@ class MazeGenerationPainter extends CustomPainter {
       }
 
       for (final (index, node) in graph.nodes.indexed) {
-        bool isCurrent = graph.activeNodeIndex == index;
+        bool isCurrent = activeNodeIndex == index;
 
         bool active = isCurrent;
         canvas.drawRect(
@@ -91,8 +95,8 @@ class MazeGenerationPainter extends CustomPainter {
       }
 
       for (final (index, node) in graph.nodes.indexed) {
-        bool isCurrent = graph.activeNodeIndex == index;
-        bool isInStack = graph.stack.contains(index);
+        bool isCurrent = activeNodeIndex == index;
+        bool isInStack = stack.contains(index);
         canvas.drawCircle(
           node.offset,
           nodeRadius,

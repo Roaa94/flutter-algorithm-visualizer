@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'graph_.dart';
+import 'graph.dart';
 
 enum GraphTraversalAlgorithm {
   dfs('DFS'),
@@ -26,6 +26,13 @@ enum MazeGenerationAlgorithm {
   const MazeGenerationAlgorithm(this.label);
 
   final String label;
+
+  Algorithm getAlgorithm(Graph graph, {bool randomized = true}) {
+    switch (this) {
+      case dfs:
+        return DFS(graph, randomized: randomized);
+    }
+  }
 }
 
 abstract class Algorithm {

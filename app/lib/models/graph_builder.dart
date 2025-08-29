@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:app/models/graph_.dart';
+import 'package:app/models/graph.dart';
 
 import '../utils.dart';
 import 'node.dart';
@@ -11,7 +11,7 @@ class GraphBuilder {
     required this.mode,
     required this.size,
     required this.cellSize,
-    required this.nodesCount,
+    this.nodesCount = 10,
     this.hasDiagonalEdges = false,
     Random? random,
   }) : _random = random ?? Random();

@@ -1,5 +1,6 @@
 import 'package:app/models/algorithms.dart';
 import 'package:app/models/graph.dart';
+import 'package:app/models/graph_builder.dart';
 import 'package:app/painters/maze_generation_painter.dart';
 import 'package:app/utils.dart';
 import 'package:app/widgets/slider_tile.dart';
@@ -24,7 +25,9 @@ class MazeGenerationPlayground extends StatefulWidget {
 class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
     with SingleTickerProviderStateMixin {
   int _desiredFrameRate = 20;
-  MazeGenerationAlgorithm _algorithm = MazeGenerationAlgorithm.dfs;
+  MazeGenerationAlgorithm _selectedAlgorithm = MazeGenerationAlgorithm.dfs;
+  late Algorithm _algorithm;
+
   double _cellSizeFraction = 0.08;
   bool _graphView = true;
 
@@ -32,7 +35,15 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
     widget.size.width * _cellSizeFraction,
     widget.size.width * _cellSizeFraction,
   );
+
   double get nodeRadius => cellSize.width / 4 * 0.6;
+
+  GraphBuilder get graphBuilder => GraphBuilder(
+    mode: GraphMode.grid,
+    size: widget.size,
+    cellSize: cellSize,
+    hasDiagonalEdges: false,
+  );
 
   late final Ticker _ticker;
   Duration _elapsed = Duration.zero;
@@ -59,20 +70,25 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
   }
 
   void _tick() {
-    if (_algorithm == MazeGenerationAlgorithm.dfs) {
-      _graph.dfsStep(randomized: true);
-    } else {
-      _graph.bfsStep(randomized: true);
+    final isCompleted = _algorithm.step();
+    if (isCompleted) {
+      //
     }
   }
 
   void _initGraph() {
+    final nodes = graphBuilder.generateNodes();
+    final edges = graphBuilder.generateEdges(nodes);
     _graph = Graph(
-      size: widget.size,
-      cellSize: cellSize,
-      hasDiagonalEdges: false,
-      startingNodeIndex: _startingNodeIndex,
-      mode: GraphMode.grid,
+      nodes: nodes,
+      edges: edges,
+    );
+  }
+
+  void _initAlgorithm() {
+    _algorithm = _selectedAlgorithm.getAlgorithm(
+      _graph,
+      randomized: true,
     );
   }
 
@@ -94,6 +110,7 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
     _lastElapsed = null;
     _startingNodeIndex = null;
     _initGraph();
+    _initAlgorithm();
     setState(() {});
   }
 
@@ -105,7 +122,7 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
 
   void _onAlgorithmChanged(MazeGenerationAlgorithm algorithm) {
     setState(() {
-      _algorithm = algorithm;
+      _selectedAlgorithm = algorithm;
     });
     _onReset();
   }
@@ -125,7 +142,7 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
     if (selectedNodeIndex < 0) return;
 
     _startingNodeIndex = selectedNodeIndex;
-    _graph.activeNodeIndex = _startingNodeIndex!;
+    _algorithm.activeNodeIndex = _startingNodeIndex!;
     setState(() {});
   }
 
@@ -134,6 +151,7 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
     super.initState();
     _ticker = createTicker(_onTick);
     _initGraph();
+    _initAlgorithm();
   }
 
   @override
@@ -171,6 +189,8 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
                   mazeView: !_graphView,
                   cellSize: cellSize.width,
                   nodeRadius: nodeRadius,
+                  activeNodeIndex: _algorithm.activeNodeIndex,
+                  stack: _algorithm.stack,
                 ),
                 child: SizedBox(
                   width: widget.size.width,
@@ -209,7 +229,7 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
                 child: SizedBox(
                   width: 250,
                   child: CustomRadioGroup<MazeGenerationAlgorithm>(
-                    selectedItem: _algorithm,
+                    selectedItem: _selectedAlgorithm,
                     items: MazeGenerationAlgorithm.values,
                     onChanged: _onAlgorithmChanged,
                     labelBuilder: (m) => m.label,

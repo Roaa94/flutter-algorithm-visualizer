@@ -1,7 +1,7 @@
 import 'package:app/utils.dart';
 import 'package:flutter/material.dart';
 
-import '../models/graph_.dart';
+import '../models/graph.dart';
 
 class GraphPainter extends CustomPainter {
   GraphPainter({
