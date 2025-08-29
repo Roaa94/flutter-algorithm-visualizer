@@ -245,7 +245,6 @@ class _GraphPlaygroundState extends State<GraphPlayground>
         children: [
           MouseRegion(
             onHover: _onHover,
-            onEnter: _onEnter,
             onExit: _onExit,
             child: GestureDetector(
               onPanDown: _onPanDown,
