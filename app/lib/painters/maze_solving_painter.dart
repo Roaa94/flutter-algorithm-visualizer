@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 import '../models/graph.dart';
 
+const _kIsDebug = false;
+
 class MazeSolvingPainter extends CustomPainter {
   MazeSolvingPainter({
     required this.originalGraph,
@@ -43,7 +45,6 @@ class MazeSolvingPainter extends CustomPainter {
     ..strokeWidth = 3;
 
   final nodePaint = Paint();
-  final cellPaint = Paint()..color = Colors.white;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -68,9 +69,10 @@ class MazeSolvingPainter extends CustomPainter {
       }
 
       for (final node in mazeGraph.nodes) {
-        if (node.previousNode != null) {
-          if (!node.isVisited || !node.previousNode!.isVisited) return;
-          // Draw arrow from previous to current node
+        if (node.previousNode != null &&
+            node.isVisited &&
+            node.previousNode!.isVisited) {
+          // Draw path from previous to current node
           canvas.drawLine(
             node.previousNode!.offset,
             node.offset,
@@ -118,7 +120,7 @@ class MazeSolvingPainter extends CustomPainter {
             center: node.offset,
             radius: cellSize / 4,
           ),
-          cellPaint
+          Paint()
             ..color = isStart
                 ? startColor
                 : isEnd
@@ -184,6 +186,25 @@ class MazeSolvingPainter extends CustomPainter {
           end,
           linePaint..color = Colors.white.withAlpha(180),
         );
+
+        if (_kIsDebug) {
+          final isHorizontal = start.dy == end.dy;
+          final isVertical = start.dx == end.dx;
+          final dx = end.dx - start.dx;
+          final dy = end.dy - start.dy;
+          paintText(
+            canvas,
+            200,
+            text: '(${dx.toStringAsFixed(2)}, ${dy.toStringAsFixed(2)})',
+            color: Colors.white,
+            offset:
+                start +
+                Offset(
+                  isHorizontal ? dx / 2 : 10,
+                  isVertical ? dy / 2 : 10,
+                ),
+          );
+        }
       }
 
       for (final node in mazeGraph.nodes) {
@@ -254,6 +275,31 @@ class MazeSolvingPainter extends CustomPainter {
           text: index.toString(),
           fontSize: nodeRadius * 0.5,
         );
+
+        if (_kIsDebug) {
+          paintText(
+            canvas,
+            200,
+            offset: node.offset + Offset(0, nodeRadius + nodeRadius * 0.5),
+            text:
+                '${node.offset.dx.toStringAsFixed(2)}, ${node.offset.dy.toStringAsFixed(2)}',
+            fontSize: nodeRadius * 0.5,
+            color: Colors.white,
+          );
+
+          final targetNode = mazeGraph.nodes[endingNodeIndex];
+          final h =
+              (node.x - targetNode.x).abs() + (node.y - targetNode.y).abs();
+
+          paintText(
+            canvas,
+            200,
+            offset: node.offset + Offset(0, nodeRadius * 2),
+            text: 'h($index) = ${h.toStringAsFixed(2)}',
+            fontSize: nodeRadius * 0.5,
+            color: Colors.white,
+          );
+        }
       }
     }
   }

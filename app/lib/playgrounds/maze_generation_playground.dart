@@ -245,7 +245,7 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
               SliderTile(
                 label: 'Grid Cell Size',
                 value: _cellSizeFraction,
-                min: 0.02,
+                min: 0.015,
                 max: 0.5,
                 onChanged: _onCellSizeChanged,
               ),

@@ -286,35 +286,46 @@ class _GraphPlaygroundState extends State<GraphPlayground>
               Positioned(
                 left: widget.size.width,
                 bottom: 0,
+                top: 0,
                 width: 100,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children:
-                          (_selectedAlgorithm.memory ==
-                                      AlgorithmMemoryType.stack
-                                  ? _algorithm.memory.reversed
-                                  : _algorithm.memory)
-                              .map(
-                                (item) => Container(
-                                  padding: const EdgeInsets.all(2.0),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.white.withAlpha(50),
+                    Expanded(
+                      child: Align(
+                        alignment:
+                            _selectedAlgorithm.memory ==
+                                AlgorithmMemoryType.stack
+                            ? Alignment.bottomCenter
+                            : Alignment.center,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children:
+                              (_selectedAlgorithm.memory ==
+                                          AlgorithmMemoryType.stack
+                                      ? _algorithm.memory.reversed
+                                      : _algorithm.memory)
+                                  .map(
+                                    (item) => Container(
+                                      padding: const EdgeInsets.all(2.0),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Colors.white.withAlpha(50),
+                                        ),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          item.toString(),
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      item.toString(),
-                                      style: TextStyle(fontSize: 12),
-                                    ),
-                                  ),
-                                ),
-                              )
-                              .toList(),
+                                  )
+                                  .toList(),
+                        ),
+                      ),
                     ),
                     Container(
                       padding: const EdgeInsets.all(2.0),

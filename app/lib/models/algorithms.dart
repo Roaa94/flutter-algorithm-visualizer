@@ -1,3 +1,4 @@
+import 'package:app/models/a_star.dart';
 import 'package:app/models/bfs.dart';
 import 'package:app/models/dfs.dart';
 
@@ -24,7 +25,8 @@ enum AlgorithmMemoryType {
 
 enum GraphTraversalAlgorithmType implements AlgorithmType {
   dfs('DFS'),
-  bfs('BFS');
+  bfs('BFS'),
+  aStar('A*');
 
   const GraphTraversalAlgorithmType(this.label);
 
@@ -38,6 +40,8 @@ enum GraphTraversalAlgorithmType implements AlgorithmType {
         return DFS(graph, randomized: randomized);
       case bfs:
         return BFS(graph, randomized: false);
+      case aStar:
+        return AStar(graph);
     }
   }
 
@@ -47,6 +51,8 @@ enum GraphTraversalAlgorithmType implements AlgorithmType {
         return AlgorithmMemoryType.stack;
       case bfs:
         return AlgorithmMemoryType.queue;
+      case aStar:
+        return AlgorithmMemoryType.openSet;
     }
   }
 }
@@ -70,7 +76,8 @@ enum MazeGenerationAlgorithmType implements AlgorithmType {
 
 enum MazeSolvingAlgorithmType implements AlgorithmType {
   dfs('DFS'),
-  bfs('BFS');
+  bfs('BFS'),
+  aStar('A*');
 
   const MazeSolvingAlgorithmType(this.label);
 
@@ -92,6 +99,12 @@ enum MazeSolvingAlgorithmType implements AlgorithmType {
         );
       case bfs:
         return BFS(
+          graph,
+          randomized: randomized,
+          startingNodeIndex: startingNodeIndex,
+        );
+      case aStar:
+        return AStar(
           graph,
           randomized: randomized,
           startingNodeIndex: startingNodeIndex,

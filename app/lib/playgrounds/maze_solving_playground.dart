@@ -34,7 +34,7 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
   bool _selectingStart = true;
   int _endingNodeIndex = -1;
 
-  double _cellSizeFraction = 0.1;
+  double _cellSizeFraction = 0.17;
   bool _showOriginalGraph = false;
   bool _showMazeCells = false;
   bool _showMazeGraph = true;
@@ -206,7 +206,7 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
   Widget build(BuildContext context) {
     return Center(
       child: Column(
-        spacing: 10,
+        spacing: 20,
         mainAxisSize: MainAxisSize.min,
         children: [
           GestureDetector(

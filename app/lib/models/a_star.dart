@@ -1,7 +1,6 @@
-import 'dart:math';
-
 import 'package:app/models/graph.dart';
 
+import '../utils.dart';
 import 'algorithms.dart';
 
 class AStar extends GraphAlgorithm {
@@ -9,13 +8,10 @@ class AStar extends GraphAlgorithm {
     super.graph, {
     super.randomized,
     super.startingNodeIndex,
-    Random? random,
-  }) : _random = random ?? Random();
+  });
 
-  late final Random _random;
-
-  // Optional: set this from outside if you want a proper heuristic target.
-  // If left null, we fall back to Dijkstra (h = 0), which still works.
+  // Set this for a proper heuristic target.
+  // If left null, we fall back to Dijkstra (h = 0)
   int? goalNodeIndex;
 
   // Internal A* state
@@ -23,20 +19,37 @@ class AStar extends GraphAlgorithm {
   final Map<int, double> _fScore = {};
   final Set<int> _closed = {};
 
-  double cost = 0;
-
   double _dist(int a, int b) {
     final na = graph.nodes[a];
     final nb = graph.nodes[b];
     final dx = na.x - nb.x;
     final dy = na.y - nb.y;
-    return sqrt(dx * dx + dy * dy);
+    return dx.abs() + dy.abs();
   }
 
   double _heuristic(int i) {
     final g = goalNodeIndex;
     if (g == null) return 0; // Dijkstra fallback if goal unknown
     return _dist(i, g);
+  }
+
+  @override
+  List<int>? findStep(int targetNodeIndex) {
+    if (activeNodeIndex < 0) return null;
+
+    if (activeNodeIndex == targetNodeIndex) {
+      // Found!
+      activeNodeIndex = -1;
+      return generatePathFromParents(
+        graph.nodes,
+        startingNodeIndex ?? 0,
+        targetNodeIndex,
+      );
+    }
+
+    goalNodeIndex = targetNodeIndex;
+    step();
+    return null;
   }
 
   @override
@@ -58,27 +71,27 @@ class AStar extends GraphAlgorithm {
       if (f < bestF) {
         bestF = f;
         bestPos = i;
-      } else if (f == bestF && randomized && _random.nextBool()) {
-        // tie-break to make it feel a bit “alive” when visualizing
+      } else if (f == bestF) {
         bestPos = i;
       }
     }
 
-    final current = memory.removeAt(bestPos);
-    activeNodeIndex = current;
+    activeNodeIndex = memory.removeAt(bestPos);
 
     // 3) Move current to closed; mark visited for visualization
-    _closed.add(current);
-    graph.nodes[current] = graph.nodes[current].copyWith(isVisited: true);
-    cost = _gScore[current] ?? 0;
+    _closed.add(activeNodeIndex);
+    graph.nodes[activeNodeIndex] = graph.nodes[activeNodeIndex].copyWith(
+      isVisited: true,
+    );
 
-    // 4) Expand neighbors (standard A* relax)
-    final neighbors = graph.adjacencyList[current];
+    // 4) Expand neighbors
+    final neighbors = graph.adjacencyList[activeNodeIndex];
     for (final neighbor in neighbors) {
       if (_closed.contains(neighbor)) continue;
 
       final tentativeG =
-          (_gScore[current] ?? double.infinity) + _dist(current, neighbor);
+          (_gScore[activeNodeIndex] ?? double.infinity) +
+          _dist(activeNodeIndex, neighbor);
       final knownG = _gScore[neighbor] ?? double.infinity;
 
       if (tentativeG < knownG) {
@@ -87,7 +100,7 @@ class AStar extends GraphAlgorithm {
 
         // Track the tree using previousNode like DFS/BFS for path reconstruction
         graph.nodes[neighbor] = graph.nodes[neighbor].copyWith(
-          previousNode: graph.nodes[current],
+          previousNode: graph.nodes[activeNodeIndex],
         );
 
         if (!memory.contains(neighbor)) {
