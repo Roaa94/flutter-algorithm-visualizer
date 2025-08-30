@@ -5,6 +5,7 @@ import 'package:app/models/node.dart';
 import 'package:app/painters/graph_painter.dart';
 import 'package:app/utils.dart';
 import 'package:app/widgets/custom_radio_group.dart';
+import 'package:app/widgets/memory_view.dart';
 import 'package:app/widgets/slider_tile.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ class GraphPlayground extends StatefulWidget {
 class _GraphPlaygroundState extends State<GraphPlayground>
     with SingleTickerProviderStateMixin {
   int _desiredFrameRate = 1;
-  GraphTraversalAlgorithmType _selectedAlgorithm =
+  GraphTraversalAlgorithmType _selectedAlgorithmType =
       GraphTraversalAlgorithmType.dfs;
   double _cellSizeFraction = 0.25;
   int _nodesCount = 10;
@@ -76,7 +77,6 @@ class _GraphPlaygroundState extends State<GraphPlayground>
     }
     _lastElapsed = elapsed;
     _tick();
-    setState(() {});
   }
 
   void _tick() {
@@ -84,6 +84,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
     if (isCompleted) {
       _paintEdges = false;
     }
+    setState(() {});
   }
 
   void _initGraph() {
@@ -96,7 +97,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
   }
 
   void _initAlgorithm() {
-    _algorithm = _selectedAlgorithm.getAlgorithm(
+    _algorithm = _selectedAlgorithmType.getAlgorithm(
       _graph,
       randomized: true,
     );
@@ -145,7 +146,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
 
   void _onAlgorithmChanged(GraphTraversalAlgorithmType algorithm) {
     setState(() {
-      _selectedAlgorithm = algorithm;
+      _selectedAlgorithmType = algorithm;
     });
     _onReset();
   }
@@ -288,56 +289,9 @@ class _GraphPlaygroundState extends State<GraphPlayground>
                 bottom: 0,
                 top: 0,
                 width: 100,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: Align(
-                        alignment:
-                            _selectedAlgorithm.memory ==
-                                AlgorithmMemoryType.stack
-                            ? Alignment.bottomCenter
-                            : Alignment.center,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisSize: MainAxisSize.min,
-                          children:
-                              (_selectedAlgorithm.memory ==
-                                          AlgorithmMemoryType.stack
-                                      ? _algorithm.memory.reversed
-                                      : _algorithm.memory)
-                                  .map(
-                                    (item) => Container(
-                                      padding: const EdgeInsets.all(2.0),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.white.withAlpha(50),
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          item.toString(),
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(2.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.white.withAlpha(50),
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(_selectedAlgorithm.memory.label),
-                    ),
-                  ],
+                child: MemoryView(
+                  algorithm: _algorithm,
+                  selectedAlgorithmType: _selectedAlgorithmType,
                 ),
               ),
             ],
@@ -352,6 +306,11 @@ class _GraphPlaygroundState extends State<GraphPlayground>
                 icon: Icon(
                   _ticker.isActive ? Icons.pause : Icons.play_arrow,
                 ),
+              ),
+              IconButton(
+                onPressed: _tick,
+                color: Colors.white,
+                icon: Icon(Icons.skip_next),
               ),
               IconButton(
                 onPressed: _toggleEdges,
@@ -389,7 +348,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
                 child: SizedBox(
                   width: 250,
                   child: CustomRadioGroup<GraphTraversalAlgorithmType>(
-                    selectedItem: _selectedAlgorithm,
+                    selectedItem: _selectedAlgorithmType,
                     items: GraphTraversalAlgorithmType.values,
                     onChanged: _onAlgorithmChanged,
                     labelBuilder: (m) => m.label,

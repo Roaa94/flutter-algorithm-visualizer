@@ -11,6 +11,8 @@ abstract class AlgorithmType {
   final String label;
 
   GraphAlgorithm getAlgorithm(Graph graph, {bool randomized = true});
+
+  AlgorithmMemoryType get memory;
 }
 
 enum AlgorithmMemoryType {
@@ -45,6 +47,7 @@ enum GraphTraversalAlgorithmType implements AlgorithmType {
     }
   }
 
+  @override
   AlgorithmMemoryType get memory {
     switch (this) {
       case dfs:
@@ -72,6 +75,14 @@ enum MazeGenerationAlgorithmType implements AlgorithmType {
         return DFS(graph, randomized: randomized);
     }
   }
+
+  @override
+  AlgorithmMemoryType get memory {
+    switch (this) {
+      case dfs:
+        return AlgorithmMemoryType.stack;
+    }
+  }
 }
 
 enum MazeSolvingAlgorithmType implements AlgorithmType {
@@ -85,8 +96,7 @@ enum MazeSolvingAlgorithmType implements AlgorithmType {
   final String label;
 
   @override
-  GraphAlgorithm getAlgorithm(
-    Graph graph, {
+  GraphAlgorithm getAlgorithm(Graph graph, {
     bool randomized = false,
     int? startingNodeIndex,
   }) {
@@ -111,11 +121,22 @@ enum MazeSolvingAlgorithmType implements AlgorithmType {
         );
     }
   }
+
+  @override
+  AlgorithmMemoryType get memory {
+    switch (this) {
+      case dfs:
+        return AlgorithmMemoryType.stack;
+      case bfs:
+        return AlgorithmMemoryType.queue;
+      case aStar:
+        return AlgorithmMemoryType.openSet;
+    }
+  }
 }
 
 abstract class GraphAlgorithm {
-  GraphAlgorithm(
-    this.graph, {
+  GraphAlgorithm(this.graph, {
     this.randomized = true,
     this.startingNodeIndex = 0,
   }) : activeNodeIndex = startingNodeIndex ?? 0;

@@ -6,7 +6,9 @@ import 'package:app/models/graph.dart';
 import 'package:app/models/graph_builder.dart';
 import 'package:app/painters/maze_solving_painter.dart';
 import 'package:app/utils.dart';
+import 'package:app/widgets/custom_checkbox.dart';
 import 'package:app/widgets/custom_radio_group.dart';
+import 'package:app/widgets/memory_view.dart';
 import 'package:app/widgets/slider_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -26,7 +28,8 @@ class MazeSolvingPlayground extends StatefulWidget {
 class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
     with SingleTickerProviderStateMixin {
   int _desiredFrameRate = 20;
-  MazeSolvingAlgorithmType _selectedAlgorithm = MazeSolvingAlgorithmType.dfs;
+  MazeSolvingAlgorithmType _selectedAlgorithmType =
+      MazeSolvingAlgorithmType.dfs;
   late GraphAlgorithm _algorithm;
   List<int>? _mazeSolutionPath;
 
@@ -73,7 +76,6 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
     }
     _lastElapsed = elapsed;
     _tick();
-    setState(() {});
   }
 
   void _tick() {
@@ -81,14 +83,13 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
     if (path != null && path.isNotEmpty) {
       // A path was found!
       log('Maze solution: $path');
-      setState(() {
-        _mazeSolutionPath = path;
-      });
+      _mazeSolutionPath = path;
     }
+    setState(() {});
   }
 
   void _onTapDown(TapDownDetails details) {
-    if(_ticker.isActive) return;
+    if (_ticker.isActive) return;
     final offset = details.localPosition;
     final selectedNodeIndex = _mazeGraph.nodes.indexWhere(
       (node) => isWithinRadius(node.offset, offset, nodeRadius),
@@ -125,7 +126,7 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
   }
 
   void _initAlgorithm() {
-    _algorithm = _selectedAlgorithm.getAlgorithm(
+    _algorithm = _selectedAlgorithmType.getAlgorithm(
       _mazeGraph,
       randomized: false,
       startingNodeIndex: _startingNodeIndex,
@@ -167,7 +168,7 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
 
   void _onAlgorithmChanged(MazeSolvingAlgorithmType algorithm) {
     setState(() {
-      _selectedAlgorithm = algorithm;
+      _selectedAlgorithmType = algorithm;
     });
     _onReset(resetOriginalGraph: false);
   }
@@ -209,112 +210,82 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
         spacing: 20,
         mainAxisSize: MainAxisSize.min,
         children: [
-          GestureDetector(
-            onTapDown: _onTapDown,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.white.withAlpha(50)),
-              ),
-              child: CustomPaint(
-                painter: MazeSolvingPainter(
-                  originalGraph: _originalGraph,
-                  mazeGraph: _mazeGraph,
-                  showOriginalGraph: _showOriginalGraph,
-                  showMazeCells: _showMazeCells,
-                  showMazeGraph: _showMazeGraph,
-                  cellSize: cellSize.width,
-                  nodeRadius: nodeRadius,
-                  activeNodeIndex: _algorithm.activeNodeIndex,
-                  stack: _algorithm.memory,
-                  mazeSolutionPath: _mazeSolutionPath,
-                  startingNodeIndex: _startingNodeIndex,
-                  endingNodeIndex: _endingNodeIndex,
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              GestureDetector(
+                onTapDown: _onTapDown,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white.withAlpha(50)),
+                  ),
+                  child: CustomPaint(
+                    painter: MazeSolvingPainter(
+                      originalGraph: _originalGraph,
+                      mazeGraph: _mazeGraph,
+                      showOriginalGraph: _showOriginalGraph,
+                      showMazeCells: _showMazeCells,
+                      showMazeGraph: _showMazeGraph,
+                      cellSize: cellSize.width,
+                      nodeRadius: nodeRadius,
+                      activeNodeIndex: _algorithm.activeNodeIndex,
+                      stack: _algorithm.memory,
+                      mazeSolutionPath: _mazeSolutionPath,
+                      startingNodeIndex: _startingNodeIndex,
+                      endingNodeIndex: _endingNodeIndex,
+                    ),
+                    child: SizedBox(
+                      width: widget.size.width,
+                      height: widget.size.height,
+                    ),
+                  ),
                 ),
-                child: SizedBox(
-                  width: widget.size.width,
-                  height: widget.size.height,
+              ),
+              Positioned(
+                left: widget.size.width,
+                bottom: 0,
+                top: 0,
+                width: 100,
+                child: MemoryView(
+                  algorithm: _algorithm,
+                  selectedAlgorithmType: _selectedAlgorithmType,
                 ),
               ),
-            ),
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 15,
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _showMazeCells = !_showMazeCells;
-                  });
-                },
-                child: Row(
-                  spacing: 10,
-                  children: [
-                    Icon(
-                      _showMazeCells ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    Text('Maze View'),
-                  ],
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _showOriginalGraph = !_showOriginalGraph;
-                  });
-                },
-                child: Row(
-                  spacing: 10,
-                  children: [
-                    Icon(
-                      _showOriginalGraph
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                    ),
-                    Text('Original Graph'),
-                  ],
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _showMazeGraph = !_showMazeGraph;
-                  });
-                },
-                child: Row(
-                  spacing: 10,
-                  children: [
-                    Icon(
-                      _showMazeGraph ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    Text('Maze Graph'),
-                  ],
-                ),
-              ),
-              ElevatedButton(
-                onPressed: _onReset,
-                child: Text('Regenerate maze'),
-              ),
-              ElevatedButton(
-                onPressed: () => _onReset(resetOriginalGraph: false),
-                child: Text('Reset solver'),
-              ),
-              Flexible(
-                child: SizedBox(
-                  width: 250,
-                  child: CustomRadioGroup<MazeSolvingAlgorithmType>(
-                    selectedItem: _selectedAlgorithm,
-                    items: MazeSolvingAlgorithmType.values,
-                    onChanged: _onAlgorithmChanged,
-                    labelBuilder: (m) => m.label,
-                  ),
-                ),
-              ),
               IconButton(
                 onPressed: _toggleTicker,
                 color: Colors.white,
                 icon: Icon(
                   _ticker.isActive ? Icons.pause : Icons.play_arrow,
+                ),
+              ),
+              IconButton(
+                onPressed: _tick,
+                color: Colors.white,
+                icon: Icon(Icons.skip_next),
+              ),
+              ElevatedButton(
+                onPressed: () => _onReset(resetOriginalGraph: false),
+                child: Text('Reset Solver'),
+              ),
+              ElevatedButton(
+                onPressed: _onReset,
+                child: Text('Regenerate maze'),
+              ),
+              Flexible(
+                child: SizedBox(
+                  width: 250,
+                  child: CustomRadioGroup<MazeSolvingAlgorithmType>(
+                    selectedItem: _selectedAlgorithmType,
+                    items: MazeSolvingAlgorithmType.values,
+                    onChanged: _onAlgorithmChanged,
+                    labelBuilder: (m) => m.label,
+                  ),
                 ),
               ),
             ],
@@ -323,6 +294,27 @@ class _MazeSolvingPlaygroundState extends State<MazeSolvingPlayground>
             mainAxisSize: MainAxisSize.min,
             spacing: 30,
             children: [
+              CustomCheckbox(
+                value: _showMazeCells,
+                onChanged: (value) => setState(() {
+                  _showMazeCells = value;
+                }),
+                label: 'Maze View',
+              ),
+              CustomCheckbox(
+                value: _showOriginalGraph,
+                onChanged: (value) => setState(() {
+                  _showOriginalGraph = value;
+                }),
+                label: 'Original Graph',
+              ),
+              CustomCheckbox(
+                value: _showMazeGraph,
+                onChanged: (value) => setState(() {
+                  _showMazeGraph = value;
+                }),
+                label: 'Maze Graph',
+              ),
               SliderTile(
                 label: 'Grid Cell Size',
                 value: _cellSizeFraction,

@@ -15,9 +15,10 @@ class AStar extends GraphAlgorithm {
   int? goalNodeIndex;
 
   // Internal A* state
-  final Map<int, double> _gScore = {};
-  final Map<int, double> _fScore = {};
-  final Set<int> _closed = {};
+  final Map<int, double> gScore = {};
+  final Map<int, double> fScore = {};
+
+  // final Set<int> closedSet = {};
 
   double _dist(int a, int b) {
     final na = graph.nodes[a];
@@ -54,11 +55,11 @@ class AStar extends GraphAlgorithm {
 
   @override
   bool step() {
-    // 1) First call: seed the open set (memory) with the start node.
+    // 1) Seed the open set (memory) with the starting node.
     if (memory.isEmpty) {
       memory.add(activeNodeIndex);
-      _gScore[activeNodeIndex] = 0;
-      _fScore[activeNodeIndex] = _heuristic(activeNodeIndex);
+      gScore[activeNodeIndex] = 0;
+      fScore[activeNodeIndex] = _heuristic(activeNodeIndex);
       // NOTE: do NOT mark visited yet; only when node is popped (closed)
     }
 
@@ -67,7 +68,7 @@ class AStar extends GraphAlgorithm {
     var bestF = double.infinity;
     for (var i = 0; i < memory.length; i++) {
       final idx = memory[i];
-      final f = _fScore[idx] ?? double.infinity;
+      final f = fScore[idx] ?? double.infinity;
       if (f < bestF) {
         bestF = f;
         bestPos = i;
@@ -77,9 +78,6 @@ class AStar extends GraphAlgorithm {
     }
 
     activeNodeIndex = memory.removeAt(bestPos);
-
-    // 3) Move current to closed; mark visited for visualization
-    _closed.add(activeNodeIndex);
     graph.nodes[activeNodeIndex] = graph.nodes[activeNodeIndex].copyWith(
       isVisited: true,
     );
@@ -87,16 +85,16 @@ class AStar extends GraphAlgorithm {
     // 4) Expand neighbors
     final neighbors = graph.adjacencyList[activeNodeIndex];
     for (final neighbor in neighbors) {
-      if (_closed.contains(neighbor)) continue;
+      if (graph.nodes[neighbor].isVisited) continue;
 
       final tentativeG =
-          (_gScore[activeNodeIndex] ?? double.infinity) +
+          (gScore[activeNodeIndex] ?? double.infinity) +
           _dist(activeNodeIndex, neighbor);
-      final knownG = _gScore[neighbor] ?? double.infinity;
+      final knownG = gScore[neighbor] ?? double.infinity;
 
       if (tentativeG < knownG) {
-        _gScore[neighbor] = tentativeG;
-        _fScore[neighbor] = tentativeG + _heuristic(neighbor);
+        gScore[neighbor] = tentativeG;
+        fScore[neighbor] = tentativeG + _heuristic(neighbor);
 
         // Track the tree using previousNode like DFS/BFS for path reconstruction
         graph.nodes[neighbor] = graph.nodes[neighbor].copyWith(
