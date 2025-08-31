@@ -35,13 +35,12 @@ FlutterDeckSlide buildTemplateSlide(
         ),
         child: Row(
           children: [
-            // Todo: add Flutter&Friends logo
             Expanded(child: Container()),
             Expanded(
               child: Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  '$slideNumber | ${speakerInfo!.socialHandle}',
+                  '${slideNumber - 1} | ${speakerInfo!.socialHandle}',
                   style: TextStyles.footer,
                 ),
               ),

@@ -32,7 +32,15 @@ class SectionTitleSlide extends FlutterDeckSlideWidget {
       showHeader: false,
       content: Stack(
         children: [
-          // Todo: add graph image
+          Positioned(
+            top: 0,
+            right: 0,
+            width: MediaQuery.sizeOf(context).width * 0.6,
+            child: Opacity(
+              opacity: 0.6,
+              child: Image.asset('assets/images/maze-bg.png'),
+            ),
+          ),
           Positioned.fill(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 200.0),
