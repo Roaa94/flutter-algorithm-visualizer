@@ -4,6 +4,25 @@ import 'package:flutter/material.dart';
 
 import 'models/node.dart';
 
+List<Color> generateIncrementalHSLColors(
+  int n, {
+  double initialHue = 360.0,
+  double saturation = 1.0,
+}) {
+  return List<Color>.generate(n, (index) {
+    return HSLColor.fromAHSL(
+      1.0, // Opacity
+      // from 0 to 360
+      initialHue * (1 - (index / n)),
+      // from 0 to 1, default should be 1
+      saturation,
+      // from 0 to 1, default should be 0.5
+      // 0.5 * (1 - (index / n)),
+      0.5,
+    ).toColor();
+  });
+}
+
 List<Offset> generateRandomPoints({
   required Random random,
   required Size canvasSize,
@@ -271,4 +290,39 @@ List<int>? generatePathFromParents(
     cur = cur.previousNode;
   }
   return null;
+}
+
+Color getNodeHSLColor(
+  Node currentNode,
+  Node lastNode,
+  Size size, {
+  bool manhattan = true,
+}) {
+  double normalizedHScore = 1.0;
+  if (manhattan) {
+    final dx = currentNode.x - lastNode.x;
+    final dy = currentNode.y - lastNode.y;
+    final hScore = dx.abs() + dy.abs();
+    normalizedHScore = hScore / (size.width + size.height);
+  } else {
+    final dx = currentNode.x - lastNode.x;
+    final dy = currentNode.y - lastNode.y;
+    final diagonal = sqrt(
+      (size.width * size.width) + (size.height * size.height),
+    );
+    normalizedHScore = sqrt((dx * dx) + (dy * dy)) / diagonal;
+  }
+  // print('normalizedH');
+  // print(normalizedH);
+  final hue = 360.0 * normalizedHScore;
+  return HSLColor.fromAHSL(
+    1.0, // Opacity
+    // from 0 to 360
+    hue >= 0 && hue <= 360.0 ? hue : 360.0,
+    // from 0 to 1, default should be 1
+    1,
+    // from 0 to 1, default should be 0.5
+    // 0.5 * (1 - (index / n)),
+    0.5,
+  ).toColor();
 }

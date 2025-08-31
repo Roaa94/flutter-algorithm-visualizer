@@ -15,8 +15,8 @@ class AStar extends GraphAlgorithm {
   int? goalNodeIndex;
 
   // Internal A* state
-  final Map<int, double> gScore = {};
-  final Map<int, double> fScore = {};
+  final Map<int, double> gScores = {};
+  final Map<int, double> fScores = {};
 
   // final Set<int> closedSet = {};
 
@@ -58,9 +58,8 @@ class AStar extends GraphAlgorithm {
     // 1) Seed the open set (memory) with the starting node.
     if (memory.isEmpty) {
       memory.add(activeNodeIndex);
-      gScore[activeNodeIndex] = 0;
-      fScore[activeNodeIndex] = _heuristic(activeNodeIndex);
-      // NOTE: do NOT mark visited yet; only when node is popped (closed)
+      gScores[activeNodeIndex] = 0;
+      fScores[activeNodeIndex] = _heuristic(activeNodeIndex);
     }
 
     // 2) Pick node from open set with the lowest f = g + h
@@ -68,7 +67,7 @@ class AStar extends GraphAlgorithm {
     var bestF = double.infinity;
     for (var i = 0; i < memory.length; i++) {
       final idx = memory[i];
-      final f = fScore[idx] ?? double.infinity;
+      final f = fScores[idx] ?? double.infinity;
       if (f < bestF) {
         bestF = f;
         bestPos = i;
@@ -88,13 +87,13 @@ class AStar extends GraphAlgorithm {
       if (graph.nodes[neighbor].isVisited) continue;
 
       final tentativeG =
-          (gScore[activeNodeIndex] ?? double.infinity) +
+          (gScores[activeNodeIndex] ?? double.infinity) +
           _dist(activeNodeIndex, neighbor);
-      final knownG = gScore[neighbor] ?? double.infinity;
+      final knownG = gScores[neighbor] ?? double.infinity;
 
       if (tentativeG < knownG) {
-        gScore[neighbor] = tentativeG;
-        fScore[neighbor] = tentativeG + _heuristic(neighbor);
+        gScores[neighbor] = tentativeG;
+        fScores[neighbor] = tentativeG + _heuristic(neighbor);
 
         // Track the tree using previousNode like DFS/BFS for path reconstruction
         graph.nodes[neighbor] = graph.nodes[neighbor].copyWith(

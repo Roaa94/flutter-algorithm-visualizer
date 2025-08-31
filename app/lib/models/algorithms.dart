@@ -150,7 +150,7 @@ abstract class GraphAlgorithm {
   // Array of node indices stored by the algorithm
   // For DFS => stack
   // For BFS => queue
-  // For A* => openSet
+  // For A* => openSet / priority queue
   List<int> memory = [];
 
   bool traverseStep() {

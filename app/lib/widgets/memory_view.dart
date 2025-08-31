@@ -19,17 +19,19 @@ class MemoryView extends StatelessWidget {
       children: [
         LabelItem(selectedAlgorithmType.memory.label),
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children:
-                (selectedAlgorithmType.memory == AlgorithmMemoryType.stack
-                        ? algorithm.memory.reversed
-                        : algorithm.memory)
-                    .map(
-                      (item) => LabelItem(item.toString()),
-                    )
-                    .toList(),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children:
+                  (selectedAlgorithmType.memory == AlgorithmMemoryType.stack
+                          ? algorithm.memory.reversed
+                          : algorithm.memory)
+                      .map(
+                        (item) => LabelItem(item.toString()),
+                      )
+                      .toList(),
+            ),
           ),
         ),
       ],

@@ -16,7 +16,7 @@ class DFS extends GraphAlgorithm {
   late final Random _random;
 
   @override
-  bool step({int? targetNodeIndex}) {
+  bool step() {
     graph.nodes[activeNodeIndex] = graph.nodes[activeNodeIndex].copyWith(
       isVisited: true,
     );
