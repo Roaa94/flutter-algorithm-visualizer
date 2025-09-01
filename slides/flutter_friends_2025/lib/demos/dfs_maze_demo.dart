@@ -5,14 +5,14 @@ import 'package:flutter_friends_2025/styles.dart';
 import 'package:flutter_friends_2025/widgets/controls.dart';
 import 'package:flutter_friends_2025/widgets/window_frame.dart';
 
-class DFSGridDemo extends StatefulWidget {
-  const DFSGridDemo({super.key});
+class DFSMazeDemo extends StatefulWidget {
+  const DFSMazeDemo({super.key});
 
   @override
-  State<DFSGridDemo> createState() => _DFSGridDemoState();
+  State<DFSMazeDemo> createState() => _DFSMazeDemoState();
 }
 
-class _DFSGridDemoState extends State<DFSGridDemo> {
+class _DFSMazeDemoState extends State<DFSMazeDemo> {
   static const double iconSize = 30;
   static const double controlsSize = 52;
   static const double borderRadius = 15;
@@ -43,12 +43,10 @@ class _DFSGridDemoState extends State<DFSGridDemo> {
                       nodesPerRow: Constants.mazeCellColCount,
                       frameRate: 60,
                       showMemory: false,
+                      isSquareGrid: true,
                       resetTrigger: resetTrigger,
                       nodeRadius: 10,
-                      isSquareGrid: true,
-                      showNodeIndex: false,
-                      edgeStrokeWidth: 2,
-                      hideEdgesWhenComplete: true,
+                      mazeView: true,
                     );
                   },
                 ),

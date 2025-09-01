@@ -28,6 +28,8 @@ class GraphTraversalDemo extends StatefulWidget {
     this.nodeRadius = 35,
     this.showNodeIndex = true,
     this.edgeStrokeWidth = 4.0,
+    this.mazeView = false,
+    this.isSquareGrid = false,
     super.key,
   });
 
@@ -48,6 +50,8 @@ class GraphTraversalDemo extends StatefulWidget {
   final double nodeRadius;
   final bool showNodeIndex;
   final double edgeStrokeWidth;
+  final bool mazeView;
+  final bool isSquareGrid;
 
   @override
   State<GraphTraversalDemo> createState() => _GraphTraversalDemoState();
@@ -70,7 +74,9 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
 
   Size get cellSize => Size(
     widget.size.width / widget.nodesPerCol,
-    widget.size.height / widget.nodesPerRow,
+    (widget.mazeView || widget.isSquareGrid
+        ? (widget.size.width / widget.nodesPerCol)
+        : (widget.size.height / widget.nodesPerRow)),
   );
 
   GraphBuilder get graphBuilder => GraphBuilder(
@@ -269,6 +275,8 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
                 paintEdges: _paintEdges,
                 showNodeIndex: widget.showNodeIndex,
                 edgeStrokeWidth: widget.edgeStrokeWidth,
+                mazeView: widget.mazeView,
+                cellSize: cellSize.width,
               ),
               child: SizedBox(
                 width: widget.size.width,
