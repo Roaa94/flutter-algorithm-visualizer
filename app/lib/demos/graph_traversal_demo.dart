@@ -37,12 +37,12 @@ class GraphTraversalDemo extends StatefulWidget {
   final bool hasControls;
   final GraphMode mode;
   final GraphTraversalAlgorithmType algorithmType;
-  final bool playTrigger;
   final int? startingNodeIndex;
   final int frameRate;
   final int nodesPerRow;
   final int nodesPerCol;
   final bool showMemory;
+  final bool playTrigger;
   final bool resetTrigger;
   final bool nextTrigger;
   final bool hideEdgesWhenComplete;

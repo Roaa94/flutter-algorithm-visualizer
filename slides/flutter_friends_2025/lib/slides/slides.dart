@@ -1,8 +1,7 @@
-import 'package:flutter_friends_2025/demos/dfs_grid_demo.dart';
-import 'package:flutter_friends_2025/slides/bfs_demo_slide.dart';
+import 'package:flutter_friends_2025/slides/bfs_maze_solving_demo_slide.dart';
 import 'package:flutter_friends_2025/slides/code.dart';
 import 'package:flutter_friends_2025/slides/dfs_demo_slide.dart';
-import 'package:flutter_friends_2025/slides/dfs_vs_bfs_demo_slide.dart';
+import 'package:flutter_friends_2025/slides/dfs_maze_solving_demo_slide.dart';
 import 'package:flutter_friends_2025/slides/graph_demo_slide.dart';
 import 'package:flutter_friends_2025/slides/maze_art_demo.dart';
 import 'package:flutter_friends_2025/slides/title_slide.dart';
@@ -104,35 +103,22 @@ final slides = [
     title: 'Flutter Simulation - Algorithm Interface',
   ),
   CodeSlide(
-    simulationCodeTickerSetUp1,
-    title: 'Flutter Simulation - Ticker Setup',
-    route: 'flutter-simulation-ticker-1',
+    algorithmFindStepCode1,
+    title: 'Algorithm Find Step Implementation',
+    route: 'algorithm-find-step-1',
   ),
   CodeSlide(
-    simulationCodeTickerSetUp2,
-    title: 'Flutter Simulation - Ticker Setup',
-    route: 'flutter-simulation-ticker-2',
+    algorithmFindStepCode2,
+    title: 'Algorithm Find Step Implementation',
+    route: 'algorithm-find-step-2',
   ),
-  DFSGridDemo(),
-  //
-  //
-  //
-  //
-  SectionTitleSlide(
-    'Breadth-First-Search (BFS) Algorithm',
-    isSubtitle: true,
-    route: 'bfs-title',
-  ),
-  CodeSlide(
-    bfsPseudoCode,
-    title: 'Breadth-First-Search (BFS) Algorithm',
-  ),
-  BFSDemoSlide(),
-  DFSvsBFSDemoSlide(),
+  BFSMazeSolvingDemoSlide(),
+  DFSMazeSolvingDemoSlide(),
   SectionTitleSlide(
     'One step further...',
     route: 'maze-art',
   ),
+  // Hue color effect code
   MazeArtDemoSlide(),
   SectionTitleSlide(
     'Thank you!',

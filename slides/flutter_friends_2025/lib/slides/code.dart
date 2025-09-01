@@ -138,3 +138,39 @@ BFS(start):
                 mark neighbor as visited
                 enqueue neighbor
 ''';
+
+const algorithmFindStepCode1 = '''
+abstract class Algorithm {
+  //...
+  int activeNodeIndex;
+  
+  void step();
+  
+  List<int>? findStep({int targetNodeIndex}) {
+    
+    
+    
+    
+
+    
+    
+  }
+}''';
+
+const algorithmFindStepCode2 = '''
+abstract class Algorithm {
+  //...
+  int activeNodeIndex;
+  
+  void step();
+  
+  List<int>? findStep({int targetNodeIndex}) {
+    if (activeNodeIndex == targetNodeIndex) {
+      // Found!
+      return generatePathFromParents(graph.nodes, 0, targetNodeIndex);
+    }
+
+    step();
+    return null;
+  }
+}''';
