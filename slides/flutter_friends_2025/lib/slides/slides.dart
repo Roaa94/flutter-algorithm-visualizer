@@ -99,8 +99,18 @@ final slides = [
   ),
   DFSDemoSlide(),
   CodeSlide(
-    simulationCode1,
-    title: 'Flutter Simulation Code',
+    simulationCodeAbstractAlgorithm,
+    title: 'Flutter Simulation - Algorithm Interface',
+  ),
+  CodeSlide(
+    simulationCodeTickerSetUp1,
+    title: 'Flutter Simulation - Ticker Setup',
+    route: 'flutter-simulation-ticker-1',
+  ),
+  CodeSlide(
+    simulationCodeTickerSetUp2,
+    title: 'Flutter Simulation - Ticker Setup',
+    route: 'flutter-simulation-ticker-2',
   ),
   //
   //

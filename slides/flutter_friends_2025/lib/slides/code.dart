@@ -81,8 +81,47 @@ DFS(start):
                 mark neighbor as visited
                 push neighbor onto stack''';
 
-const simulationCode1 = '''
-''';
+const simulationCodeAbstractAlgorithm = '''
+abstract class Algorithm {
+  Graph graph;
+
+  List<int> stack = [];
+  int activeNodeIndex;
+  
+  // Incrementally update algorithm state 
+  void step();
+}''';
+
+const simulationCodeTickerSetUp1 = '''
+class _SimulationWidgetState extends State<SimulationWidget>
+    with SingleTickerProviderStateMixin {
+    
+    late final Ticker _ticker;
+
+    @override
+    void initState() {
+      super.initState();
+      _ticker = createTicker(_onTick);
+    }
+}''';
+
+const simulationCodeTickerSetUp2 = '''
+class _SimulationWidgetState extends State<SimulationWidget>
+    with SingleTickerProviderStateMixin {
+    
+    late final Ticker _ticker;
+    
+    void _onTick(Duration elapsed) {
+      _algorithm.step();
+      setState(() => {});
+    }
+
+    @override
+    void initState() {
+      super.initState();
+      _ticker = createTicker(_onTick);
+    }
+}''';
 
 const bfsPseudoCode = '''
 BFS(start):
