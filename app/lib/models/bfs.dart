@@ -15,7 +15,7 @@ class BFS extends GraphAlgorithm {
   late final Random _random;
 
   @override
-  bool step({int? targetNodeIndex}) {
+  bool step() {
     // Seed the queue with the starting node once.
     if (memory.isEmpty) {
       memory.add(activeNodeIndex);

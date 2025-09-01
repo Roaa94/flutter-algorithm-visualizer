@@ -1,4 +1,3 @@
-import 'package:app/models/a_star.dart';
 import 'package:app/models/bfs.dart';
 import 'package:app/models/dfs.dart';
 
@@ -36,12 +35,24 @@ enum GraphTraversalAlgorithmType implements AlgorithmType {
   final String label;
 
   @override
-  GraphAlgorithm getAlgorithm(Graph graph, {bool randomized = true}) {
+  GraphAlgorithm getAlgorithm(
+    Graph graph, {
+    bool randomized = true,
+    int? startingNodeIndex,
+  }) {
     switch (this) {
       case dfs:
-        return DFS(graph, randomized: randomized);
+        return DFS(
+          graph,
+          randomized: randomized,
+          startingNodeIndex: startingNodeIndex,
+        );
       case bfs:
-        return BFS(graph, randomized: false);
+        return BFS(
+          graph,
+          randomized: false,
+          startingNodeIndex: startingNodeIndex,
+        );
       // case aStar:
       //   return AStar(graph);
     }
@@ -96,7 +107,8 @@ enum MazeSolvingAlgorithmType implements AlgorithmType {
   final String label;
 
   @override
-  GraphAlgorithm getAlgorithm(Graph graph, {
+  GraphAlgorithm getAlgorithm(
+    Graph graph, {
     bool randomized = false,
     int? startingNodeIndex,
   }) {
@@ -136,7 +148,8 @@ enum MazeSolvingAlgorithmType implements AlgorithmType {
 }
 
 abstract class GraphAlgorithm {
-  GraphAlgorithm(this.graph, {
+  GraphAlgorithm(
+    this.graph, {
     this.randomized = true,
     this.startingNodeIndex = 0,
   }) : activeNodeIndex = startingNodeIndex ?? 0;

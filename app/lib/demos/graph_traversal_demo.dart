@@ -25,6 +25,7 @@ class GraphTraversalDemo extends StatefulWidget {
     this.nodesPerCol = 3,
     this.showMemory = false,
     this.nextTrigger = false,
+    this.hideEdgesWhenComplete = false,
     super.key,
   });
 
@@ -40,6 +41,7 @@ class GraphTraversalDemo extends StatefulWidget {
   final bool showMemory;
   final bool resetTrigger;
   final bool nextTrigger;
+  final bool hideEdgesWhenComplete;
 
   @override
   State<GraphTraversalDemo> createState() => _GraphTraversalDemoState();
@@ -63,6 +65,7 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
   late final Ticker _ticker;
   Duration _elapsed = Duration.zero;
   Duration? _lastElapsed;
+  bool _paintEdges = true;
 
   Size get cellSize => Size(
     widget.size.width / _nodesPerCol,
@@ -106,8 +109,8 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
 
   void _tick() {
     final isCompleted = _algorithm.traverseStep();
-    if (isCompleted) {
-      //
+    if (isCompleted && widget.hideEdgesWhenComplete) {
+      _paintEdges = false;
     }
     setState(() {});
   }
@@ -125,6 +128,7 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
     _algorithm = _selectedAlgorithmType.getAlgorithm(
       _graph,
       randomized: true,
+      startingNodeIndex: _startingNodeIndex,
     );
   }
 
@@ -145,6 +149,7 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
     _elapsed = Duration.zero;
     _lastElapsed = null;
     _startingNodeIndex = null;
+    _paintEdges = true;
     _initGraph();
     _initAlgorithm();
     setState(() {});
@@ -303,6 +308,7 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
                 selectedNodeIndex: _selectedNodeIndex,
                 activeNodeIndex: _algorithm.activeNodeIndex,
                 stack: _algorithm.memory,
+                paintEdges: _paintEdges,
               ),
               child: SizedBox(
                 width: widget.size.width,

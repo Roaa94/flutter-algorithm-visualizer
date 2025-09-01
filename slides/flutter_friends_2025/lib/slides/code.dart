@@ -80,3 +80,6 @@ DFS(start):
             if neighbor is not visited:
                 mark neighbor as visited
                 push neighbor onto stack''';
+
+const simulationCode1 = '''
+''';
