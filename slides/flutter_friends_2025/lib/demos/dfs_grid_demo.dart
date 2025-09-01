@@ -49,6 +49,7 @@ class _DFSGridDemoState extends State<DFSGridDemo> {
                       showNodeIndex: false,
                       edgeStrokeWidth: 2,
                       hideEdgesWhenComplete: true,
+                      hasDiagonalEdges: false,
                     );
                   },
                 ),

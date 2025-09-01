@@ -66,6 +66,11 @@ for (final node in graph.nodes) {
   }
 }''';
 
+const graphPaintingCode4 = '''
+bool isHoveredNeighbor = 
+    graph.adjacencyList[hoveredNodeIndex]
+    .contains(index);''';
+
 const dfsPseudoCode = '''
 DFS(start):
     create an empty stack
@@ -90,6 +95,54 @@ abstract class Algorithm {
   
   // Incrementally update algorithm state 
   void step();
+}''';
+
+const simulationCodeDFSAlgorithmSnippet1 = '''
+class DFS {                            
+  Graph graph;
+
+  List<int> stack = [];
+  int activeNodeIndex;
+  
+  void step() {
+    //
+  }
+}''';
+
+const simulationCodeDFSAlgorithmSnippet2 = '''
+class DFS {                            
+  //...
+  void step() {
+    // Find neighbors easily with adjacency list
+    final nextUnvisitedNeighbor = adjacencyList[nodeIndex].firstWhereOrNull(
+          (index) => !nodes[index].isVisited,
+        );
+        
+    
+    
+    
+    
+    
+    
+  }
+}''';
+
+const simulationCodeDFSAlgorithmSnippet3 = '''
+class DFS {                            
+  //...
+  void step() {
+    // Find neighbors easily with adjacency list
+    final nextUnvisitedNeighbor = adjacencyList[nodeIndex].firstWhereOrNull(
+          (index) => !nodes[index].isVisited,
+        );
+        
+    graph.nodes[nextIndex] = graph.nodes[nextIndex].copyWith(
+        // Set visited status for visualization
+        isVisited: true,
+        // Set previous nodes of visited nodes
+        previousNode: graph.nodes[activeNodeIndex],
+    );
+  }
 }''';
 
 const simulationCodeTickerSetUp1 = '''

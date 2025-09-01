@@ -18,6 +18,7 @@ class _DFSMazeDemoState extends State<DFSMazeDemo> {
   static const double borderRadius = 15;
   bool playTrigger = false;
   bool resetTrigger = false;
+  bool showMazeView = true;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +47,9 @@ class _DFSMazeDemoState extends State<DFSMazeDemo> {
                       isSquareGrid: true,
                       resetTrigger: resetTrigger,
                       nodeRadius: 10,
-                      mazeView: true,
+                      mazeView: showMazeView,
+                      hasDiagonalEdges: false,
+                      showNodeIndex: false,
                     );
                   },
                 ),
@@ -88,6 +91,22 @@ class _DFSMazeDemoState extends State<DFSMazeDemo> {
                     iconSize: iconSize,
                     icon: Icons.refresh,
                   ),
+                  ControlsButton(
+                    onTap: () {
+                      setState(() {
+                        showMazeView = !showMazeView;
+                      });
+                    },
+                    size: controlsSize,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(borderRadius),
+                      topRight: Radius.circular(borderRadius),
+                    ),
+                    iconSize: iconSize,
+                    icon: showMazeView
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                  )
                 ],
               ),
             ),
