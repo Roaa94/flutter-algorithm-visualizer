@@ -1,3 +1,4 @@
+import 'package:flutter_friends_2025/demos/dfs_grid_demo.dart';
 import 'package:flutter_friends_2025/slides/bfs_demo_slide.dart';
 import 'package:flutter_friends_2025/slides/code.dart';
 import 'package:flutter_friends_2025/slides/dfs_demo_slide.dart';
@@ -112,6 +113,7 @@ final slides = [
     title: 'Flutter Simulation - Ticker Setup',
     route: 'flutter-simulation-ticker-2',
   ),
+  DFSGridDemo(),
   //
   //
   //

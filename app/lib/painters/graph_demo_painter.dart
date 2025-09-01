@@ -1,3 +1,4 @@
+import 'package:app/styles.dart';
 import 'package:app/utils.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,8 @@ class GraphDemoPainter extends CustomPainter {
     this.stack = const [],
     this.nodeRadius = 20,
     this.paintEdges = true,
+    this.showNodeIndex = true,
+    this.edgeStrokeWidth = 4.0
   });
 
   final Graph graph;
@@ -23,19 +26,21 @@ class GraphDemoPainter extends CustomPainter {
   final double nodeRadius;
   final bool paintEdges;
   final List<int> stack;
+  final bool showNodeIndex;
+  final double edgeStrokeWidth;
 
-  static const primaryColor = Colors.blue;
+  static const primaryColor = AppColors.primary;
   static const activeColor = Colors.pink;
   static const secondaryColor = Colors.yellow;
 
   final linePaint = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = 4;
+    ..style = PaintingStyle.stroke;
 
   final nodePaint = Paint();
 
   @override
   void paint(Canvas canvas, Size size) {
+    linePaint.strokeWidth = edgeStrokeWidth;
     if (paintEdges) {
       for (final edge in graph.edges) {
         final start = graph.nodes[edge.first].offset;
@@ -100,13 +105,15 @@ class GraphDemoPainter extends CustomPainter {
               ? secondaryColor
               : Colors.white,
       );
-      paintText(
-        canvas,
-        nodeRadius,
-        offset: node.offset,
-        text: index.toString(),
-        fontSize: nodeRadius * 0.7,
-      );
+      if (showNodeIndex) {
+        paintText(
+          canvas,
+          nodeRadius,
+          offset: node.offset,
+          text: index.toString(),
+          fontSize: nodeRadius * 0.7,
+        );
+      }
     }
   }
 

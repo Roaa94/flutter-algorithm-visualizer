@@ -4,9 +4,7 @@ import 'package:app/models/graph_builder.dart';
 import 'package:app/models/node.dart';
 import 'package:app/painters/graph_demo_painter.dart';
 import 'package:app/utils.dart';
-import 'package:app/widgets/custom_radio_group.dart';
 import 'package:app/widgets/demo_memory_view.dart';
-import 'package:app/widgets/slider_tile.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -26,6 +24,10 @@ class GraphTraversalDemo extends StatefulWidget {
     this.showMemory = false,
     this.nextTrigger = false,
     this.hideEdgesWhenComplete = false,
+    this.hasDiagonalEdges = false,
+    this.nodeRadius = 35,
+    this.showNodeIndex = true,
+    this.edgeStrokeWidth = 4.0,
     super.key,
   });
 
@@ -42,6 +44,10 @@ class GraphTraversalDemo extends StatefulWidget {
   final bool resetTrigger;
   final bool nextTrigger;
   final bool hideEdgesWhenComplete;
+  final bool hasDiagonalEdges;
+  final double nodeRadius;
+  final bool showNodeIndex;
+  final double edgeStrokeWidth;
 
   @override
   State<GraphTraversalDemo> createState() => _GraphTraversalDemoState();
@@ -51,16 +57,11 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
     with SingleTickerProviderStateMixin {
   late int _desiredFrameRate;
   late GraphTraversalAlgorithmType _selectedAlgorithmType;
-  double _cellSizeFraction = 0.25;
-  int _nodesPerCol = 5;
-  int _nodesPerRow = 5;
-  int _nodesCount = 10;
-  double _nodesRadius = 35;
+  final _nodesCount = 10;
 
   late GraphAlgorithm _algorithm;
 
   late GraphMode _mode;
-  bool _hasDiagonalEdges = true;
 
   late final Ticker _ticker;
   Duration _elapsed = Duration.zero;
@@ -68,8 +69,8 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
   bool _paintEdges = true;
 
   Size get cellSize => Size(
-    widget.size.width / _nodesPerCol,
-    widget.size.height / _nodesPerRow,
+    widget.size.width / widget.nodesPerCol,
+    widget.size.height / widget.nodesPerRow,
   );
 
   GraphBuilder get graphBuilder => GraphBuilder(
@@ -77,7 +78,7 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
     size: widget.size,
     cellSize: cellSize,
     nodesCount: _nodesCount,
-    hasDiagonalEdges: _hasDiagonalEdges,
+    hasDiagonalEdges: widget.hasDiagonalEdges,
   );
 
   Duration get _desiredFrameTime => Duration(
@@ -155,51 +156,10 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
     setState(() {});
   }
 
-  void _onFrameRateChanged(int value) {
-    setState(() {
-      _desiredFrameRate = value;
-    });
-  }
-
-  void _onModeChanged(GraphMode mode) {
-    setState(() {
-      _mode = mode;
-    });
-    _onReset();
-  }
-
-  void _onAlgorithmChanged(GraphTraversalAlgorithmType algorithm) {
-    setState(() {
-      _selectedAlgorithmType = algorithm;
-    });
-    _onReset();
-  }
-
-  void _onCellSizeChanged(double value) {
-    setState(() {
-      _cellSizeFraction = value;
-    });
-    _onReset();
-  }
-
-  void _onNodesCountChanged(int value) {
-    setState(() {
-      _nodesCount = value;
-    });
-    _onReset();
-  }
-
-  void _onDiagonalEdgesToggle() {
-    setState(() {
-      _hasDiagonalEdges = !_hasDiagonalEdges;
-    });
-    _onReset();
-  }
-
   void _onHover(PointerHoverEvent event) {
     final offset = event.localPosition;
     final hoveredNodeIndex = _graph.nodes.indexWhere(
-      (node) => isWithinRadius(node.offset, offset, _nodesRadius),
+      (node) => isWithinRadius(node.offset, offset, widget.nodeRadius),
     );
     if (hoveredNodeIndex < 0 && _hoveredNodeIndex == hoveredNodeIndex) return;
     setState(() {
@@ -225,7 +185,7 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
   void _onPanDown(DragDownDetails details) {
     final offset = details.localPosition;
     final selectedNodeIndex = _graph.nodes.indexWhere(
-      (node) => isWithinRadius(node.offset, offset, _nodesRadius),
+      (node) => isWithinRadius(node.offset, offset, widget.nodeRadius),
     );
     if (selectedNodeIndex < 0) return;
 
@@ -254,8 +214,6 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
       _startingNodeIndex = widget.startingNodeIndex;
     }
     _desiredFrameRate = widget.frameRate;
-    _nodesPerRow = widget.nodesPerRow;
-    _nodesPerCol = widget.nodesPerCol;
     _ticker = createTicker(_onTick);
     _initGraph();
     _initAlgorithm();
@@ -302,13 +260,15 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
             child: CustomPaint(
               painter: GraphDemoPainter(
                 graph: _graph,
-                nodeRadius: _nodesRadius,
+                nodeRadius: widget.nodeRadius,
                 hoverOffset: _hoverOffset,
                 hoveredNodeIndex: _hoveredNodeIndex,
                 selectedNodeIndex: _selectedNodeIndex,
                 activeNodeIndex: _algorithm.activeNodeIndex,
                 stack: _algorithm.memory,
                 paintEdges: _paintEdges,
+                showNodeIndex: widget.showNodeIndex,
+                edgeStrokeWidth: widget.edgeStrokeWidth,
               ),
               child: SizedBox(
                 width: widget.size.width,
@@ -317,100 +277,6 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
             ),
           ),
         ),
-        if (widget.hasControls)
-          Positioned(
-            bottom: 0,
-            right: 0,
-            left: 0,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              spacing: 30,
-              children: [
-                IconButton(
-                  onPressed: _toggleTicker,
-                  color: Colors.white,
-                  icon: Icon(
-                    _ticker.isActive ? Icons.pause : Icons.play_arrow,
-                  ),
-                ),
-                IconButton(
-                  onPressed: _tick,
-                  color: Colors.white,
-                  icon: Icon(Icons.skip_next),
-                ),
-                Opacity(
-                  opacity: _hasDiagonalEdges ? 1 : 0.5,
-                  child: IconButton(
-                    onPressed: _onDiagonalEdgesToggle,
-                    color: Colors.white,
-                    icon: Icon(
-                      Icons.call_received,
-                    ),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: _onReset,
-                  child: Text('Reset'),
-                ),
-                Flexible(
-                  child: SizedBox(
-                    width: 400,
-                    child: CustomRadioGroup<GraphMode>(
-                      selectedItem: _mode,
-                      items: GraphMode.values,
-                      onChanged: _onModeChanged,
-                      labelBuilder: (m) => m.label,
-                    ),
-                  ),
-                ),
-                Flexible(
-                  child: SizedBox(
-                    width: 250,
-                    child: CustomRadioGroup<GraphTraversalAlgorithmType>(
-                      selectedItem: _selectedAlgorithmType,
-                      items: GraphTraversalAlgorithmType.values,
-                      onChanged: _onAlgorithmChanged,
-                      labelBuilder: (m) => m.label,
-                    ),
-                  ),
-                ),
-                if (_mode == GraphMode.grid)
-                  SliderTile(
-                    label: 'Grid Cell Size',
-                    value: _cellSizeFraction,
-                    min: 0.05,
-                    max: 0.5,
-                    onChanged: _onCellSizeChanged,
-                  ),
-                if (_mode == GraphMode.circle)
-                  SliderTile(
-                    label: 'Nodes count',
-                    value: _nodesCount.toDouble(),
-                    min: 2,
-                    max: 50,
-                    onChanged: (value) => _onNodesCountChanged(value.toInt()),
-                  ),
-                SliderTile(
-                  label: 'Nodes Radius',
-                  value: _nodesRadius,
-                  min: 1,
-                  max: 40,
-                  onChanged: (value) {
-                    setState(() {
-                      _nodesRadius = value;
-                    });
-                  },
-                ),
-                SliderTile(
-                  label: 'FPS',
-                  value: _desiredFrameRate,
-                  min: 1,
-                  max: 60,
-                  onChanged: (value) => _onFrameRateChanged(value.toInt()),
-                ),
-              ],
-            ),
-          ),
         if (widget.showMemory)
           Positioned(
             right: 0,
