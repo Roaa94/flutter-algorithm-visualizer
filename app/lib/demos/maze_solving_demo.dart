@@ -169,6 +169,9 @@ class _MazeSolvingDemoState extends State<MazeSolvingDemo>
     _initGraph();
     _buildMaze();
     _initAlgorithm();
+    if (widget.playTrigger) {
+      _toggleTicker();
+    }
   }
 
   @override

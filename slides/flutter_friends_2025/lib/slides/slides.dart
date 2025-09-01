@@ -2,6 +2,7 @@ import 'package:flutter_friends_2025/slides/bfs_maze_solving_demo_slide.dart';
 import 'package:flutter_friends_2025/slides/code.dart';
 import 'package:flutter_friends_2025/slides/dfs_demo_slide.dart';
 import 'package:flutter_friends_2025/slides/dfs_maze_solving_demo_slide.dart';
+import 'package:flutter_friends_2025/slides/dfs_vs_bfs_maze_solving_demo_slide.dart';
 import 'package:flutter_friends_2025/slides/graph_demo_slide.dart';
 import 'package:flutter_friends_2025/slides/maze_art_demo.dart';
 import 'package:flutter_friends_2025/slides/title_slide.dart';
@@ -114,6 +115,7 @@ final slides = [
   ),
   BFSMazeSolvingDemoSlide(),
   DFSMazeSolvingDemoSlide(),
+  DFSvsBFSMazeSolvingDemoSlide(),
   SectionTitleSlide(
     'One step further...',
     route: 'maze-art',

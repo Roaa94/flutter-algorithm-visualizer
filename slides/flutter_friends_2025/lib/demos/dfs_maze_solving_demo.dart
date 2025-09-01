@@ -18,6 +18,7 @@ class _DFSMazeSolvingDemoState extends State<DFSMazeSolvingDemo> {
   static const double borderRadius = 15;
   bool playTrigger = false;
   bool resetTrigger = false;
+  bool showMazeView = true;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,7 @@ class _DFSMazeSolvingDemoState extends State<DFSMazeSolvingDemo> {
       child: Stack(
         children: [
           WindowFrame(
-            label: 'DFS Solver',
+            label: 'DFS Solver - Custom Start & End',
             child: Container(
               padding: const EdgeInsets.all(8.0),
               color: Colors.black,
@@ -43,6 +44,7 @@ class _DFSMazeSolvingDemoState extends State<DFSMazeSolvingDemo> {
                       nodesPerCol: Constants.mazeCellColCount,
                       frameRate: 60,
                       resetTrigger: resetTrigger,
+                      mazeView: showMazeView,
                     );
                   },
                 ),
@@ -83,6 +85,22 @@ class _DFSMazeSolvingDemoState extends State<DFSMazeSolvingDemo> {
                     ),
                     iconSize: iconSize,
                     icon: Icons.refresh,
+                  ),
+                  ControlsButton(
+                    onTap: () {
+                      setState(() {
+                        showMazeView = !showMazeView;
+                      });
+                    },
+                    size: controlsSize,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(borderRadius),
+                      topRight: Radius.circular(borderRadius),
+                    ),
+                    iconSize: iconSize,
+                    icon: showMazeView
+                        ? Icons.visibility
+                        : Icons.visibility_off,
                   ),
                 ],
               ),
