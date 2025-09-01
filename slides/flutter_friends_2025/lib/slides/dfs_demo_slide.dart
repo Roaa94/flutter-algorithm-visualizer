@@ -16,7 +16,7 @@ class DFSDemoSlide extends FlutterDeckSlideWidget {
   FlutterDeckSlide build(BuildContext context) {
     return buildTemplateSlide(
       context,
-      title: 'Grid Graph',
+      title: 'DFS Algorithm',
       showHeader: true,
       content: const DFSDemo(),
     );

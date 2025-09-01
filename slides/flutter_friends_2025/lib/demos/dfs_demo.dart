@@ -16,6 +16,7 @@ class _DFSDemoState extends State<DFSDemo> {
   static const double controlsSize = 52;
   static const double borderRadius = 15;
   static const Color activeColor = AppColors.primary;
+  bool nextTrigger = false;
   bool playTrigger = false;
   bool resetTrigger = false;
 
@@ -43,6 +44,8 @@ class _DFSDemoState extends State<DFSDemo> {
                       nodesPerRow: 3,
                       frameRate: 2,
                       showMemory: true,
+                      resetTrigger: resetTrigger,
+                      nextTrigger: nextTrigger,
                     );
                   },
                 ),
@@ -57,7 +60,18 @@ class _DFSDemoState extends State<DFSDemo> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
+                spacing: 10,
                 children: [
+                  ControlsButton(
+                    onTap: () => setState(() => nextTrigger = !nextTrigger),
+                    size: controlsSize,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(borderRadius),
+                      topRight: Radius.circular(borderRadius),
+                    ),
+                    iconSize: iconSize,
+                    icon: Icons.skip_next,
+                  ),
                   ControlsButton(
                     onTap: () => setState(() => playTrigger = !playTrigger),
                     size: controlsSize,
@@ -69,7 +83,11 @@ class _DFSDemoState extends State<DFSDemo> {
                     icon: playTrigger ? Icons.pause : Icons.play_arrow,
                   ),
                   ControlsButton(
-                    onTap: () => setState(() => resetTrigger = !resetTrigger),
+                    onTap: () {
+                      setState(() {
+                        resetTrigger = !resetTrigger;
+                      });
+                    },
                     size: controlsSize,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(borderRadius),

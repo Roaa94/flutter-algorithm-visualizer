@@ -24,6 +24,7 @@ class GraphTraversalDemo extends StatefulWidget {
     this.nodesPerRow = 3,
     this.nodesPerCol = 3,
     this.showMemory = false,
+    this.nextTrigger = false,
     super.key,
   });
 
@@ -38,6 +39,7 @@ class GraphTraversalDemo extends StatefulWidget {
   final int nodesPerCol;
   final bool showMemory;
   final bool resetTrigger;
+  final bool nextTrigger;
 
   @override
   State<GraphTraversalDemo> createState() => _GraphTraversalDemoState();
@@ -56,7 +58,6 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
   late GraphAlgorithm _algorithm;
 
   late GraphMode _mode;
-  bool _paintEdges = true;
   bool _hasDiagonalEdges = true;
 
   late final Ticker _ticker;
@@ -106,7 +107,7 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
   void _tick() {
     final isCompleted = _algorithm.traverseStep();
     if (isCompleted) {
-      _paintEdges = false;
+      //
     }
     setState(() {});
   }
@@ -125,12 +126,6 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
       _graph,
       randomized: true,
     );
-  }
-
-  void _toggleEdges() {
-    setState(() {
-      _paintEdges = !_paintEdges;
-    });
   }
 
   void _toggleTicker() {
@@ -275,6 +270,9 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
     if (oldWidget.playTrigger != widget.playTrigger) {
       _toggleTicker();
     }
+    if (oldWidget.nextTrigger != widget.nextTrigger) {
+      _tick();
+    }
   }
 
   @override
@@ -300,7 +298,6 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
               painter: GraphDemoPainter(
                 graph: _graph,
                 nodeRadius: _nodesRadius,
-                paintEdges: _paintEdges,
                 hoverOffset: _hoverOffset,
                 hoveredNodeIndex: _hoveredNodeIndex,
                 selectedNodeIndex: _selectedNodeIndex,
@@ -334,13 +331,6 @@ class _GraphTraversalDemoState extends State<GraphTraversalDemo>
                   onPressed: _tick,
                   color: Colors.white,
                   icon: Icon(Icons.skip_next),
-                ),
-                IconButton(
-                  onPressed: _toggleEdges,
-                  color: Colors.white,
-                  icon: Icon(
-                    _paintEdges ? Icons.visibility : Icons.visibility_off,
-                  ),
                 ),
                 Opacity(
                   opacity: _hasDiagonalEdges ? 1 : 0.5,
