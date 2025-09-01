@@ -83,3 +83,19 @@ DFS(start):
 
 const simulationCode1 = '''
 ''';
+
+const bfsPseudoCode = '''
+BFS(start):
+    create an empty queue
+    enqueue start node
+    mark start as visited
+
+    while queue is not empty:
+        current = queue.dequeue()
+        visit(current)
+
+        for each neighbor of current:
+            if neighbor is not visited:
+                mark neighbor as visited
+                enqueue neighbor
+''';

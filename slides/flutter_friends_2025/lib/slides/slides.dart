@@ -1,5 +1,7 @@
+import 'package:flutter_friends_2025/slides/bfs_demo_slide.dart';
 import 'package:flutter_friends_2025/slides/code.dart';
 import 'package:flutter_friends_2025/slides/dfs_demo_slide.dart';
+import 'package:flutter_friends_2025/slides/dfs_vs_bfs_demo_slide.dart';
 import 'package:flutter_friends_2025/slides/graph_demo_slide.dart';
 import 'package:flutter_friends_2025/slides/maze_art_demo.dart';
 import 'package:flutter_friends_2025/slides/title_slide.dart';
@@ -96,6 +98,29 @@ final slides = [
     title: 'Depth-First-Search (DFS) Algorithm',
   ),
   DFSDemoSlide(),
+  CodeSlide(
+    simulationCode1,
+    title: 'Flutter Simulation Code',
+  ),
+  //
+  //
+  //
+  //
+  SectionTitleSlide(
+    'Breadth-First-Search (BFS) Algorithm',
+    isSubtitle: true,
+    route: 'bfs-title',
+  ),
+  CodeSlide(
+    bfsPseudoCode,
+    title: 'Breadth-First-Search (BFS) Algorithm',
+  ),
+  BFSDemoSlide(),
+  DFSvsBFSDemoSlide(),
+  SectionTitleSlide(
+    'One step further...',
+    route: 'maze-art',
+  ),
   MazeArtDemoSlide(),
   SectionTitleSlide(
     'Thank you!',
