@@ -118,7 +118,11 @@ final slides = [
     'One step further...',
     route: 'maze-art',
   ),
-  // Hue color effect code
+  CodeSlide(
+    hueMazeEffectCode,
+    title: '',
+    route: 'maze-art-code',
+  ),
   MazeArtDemoSlide(),
   SectionTitleSlide(
     'Thank you!',

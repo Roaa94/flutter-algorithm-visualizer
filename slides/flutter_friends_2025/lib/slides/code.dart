@@ -174,3 +174,17 @@ abstract class Algorithm {
     return null;
   }
 }''';
+
+const hueMazeEffectCode = '''
+final dx = currentNode.x - lastNode.x;
+final dy = currentNode.y - lastNode.y;
+final diagonal = sqrt(
+  (size.width * size.width) + (size.height * size.height),
+);
+final h = sqrt((dx * dx) + (dy * dy)) / diagonal;
+final hue = 360.0 * normalizedHScore;
+final color = HSLColor.fromAHSL(
+  1.0,
+  360.0 * normalizedHScore, // hue
+  0.5,
+).toColor();''';

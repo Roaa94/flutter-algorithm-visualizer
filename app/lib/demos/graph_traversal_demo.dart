@@ -24,7 +24,7 @@ class GraphTraversalDemo extends StatefulWidget {
     this.showMemory = false,
     this.nextTrigger = false,
     this.hideEdgesWhenComplete = false,
-    this.hasDiagonalEdges = false,
+    this.hasDiagonalEdges = true,
     this.nodeRadius = 35,
     this.showNodeIndex = true,
     this.edgeStrokeWidth = 4.0,

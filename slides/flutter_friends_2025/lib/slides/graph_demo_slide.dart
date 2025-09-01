@@ -17,8 +17,6 @@ class GraphDemoSlide extends FlutterDeckSlideWidget {
   FlutterDeckSlide build(BuildContext context) {
     return buildTemplateSlide(
       context,
-      title: 'Grid Graph',
-      showHeader: true,
       content: WindowFrame(
         margin: const EdgeInsets.symmetric(horizontal: 100.0, vertical: 40),
         label: 'Graph',
