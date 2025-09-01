@@ -43,6 +43,20 @@ class GraphBuilder {
         canvasSize: size,
         pointsCount: nodesCount,
       );
+      // offsets = [
+      //   Offset(114, 111),
+      //   Offset(631, 230),
+      //   Offset(274, 603),
+      //   Offset(667, 569),
+      //   Offset(892, 137),
+      //   Offset(444, 77),
+      //   Offset(41, 238),
+      //   Offset(237, 282),
+      //   Offset(852, 325),
+      //   Offset(1009, 498),
+      //   Offset(106, 444),
+      //   Offset(506, 425),
+      // ];
     }
     return offsets.map((offset) => Node(offset.dx, offset.dy)).toList();
   }

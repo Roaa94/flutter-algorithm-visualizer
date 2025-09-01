@@ -27,8 +27,8 @@ enum AlgorithmMemoryType {
 
 enum GraphTraversalAlgorithmType implements AlgorithmType {
   dfs('DFS'),
-  bfs('BFS'),
-  aStar('A*');
+  bfs('BFS');
+  // aStar('A*');
 
   const GraphTraversalAlgorithmType(this.label);
 
@@ -42,8 +42,8 @@ enum GraphTraversalAlgorithmType implements AlgorithmType {
         return DFS(graph, randomized: randomized);
       case bfs:
         return BFS(graph, randomized: false);
-      case aStar:
-        return AStar(graph);
+      // case aStar:
+      //   return AStar(graph);
     }
   }
 
@@ -54,8 +54,8 @@ enum GraphTraversalAlgorithmType implements AlgorithmType {
         return AlgorithmMemoryType.stack;
       case bfs:
         return AlgorithmMemoryType.queue;
-      case aStar:
-        return AlgorithmMemoryType.openSet;
+      // case aStar:
+      //   return AlgorithmMemoryType.openSet;
     }
   }
 }
@@ -87,8 +87,8 @@ enum MazeGenerationAlgorithmType implements AlgorithmType {
 
 enum MazeSolvingAlgorithmType implements AlgorithmType {
   dfs('DFS'),
-  bfs('BFS'),
-  aStar('A*');
+  bfs('BFS');
+  // aStar('A*');
 
   const MazeSolvingAlgorithmType(this.label);
 
@@ -113,12 +113,12 @@ enum MazeSolvingAlgorithmType implements AlgorithmType {
           randomized: randomized,
           startingNodeIndex: startingNodeIndex,
         );
-      case aStar:
-        return AStar(
-          graph,
-          randomized: randomized,
-          startingNodeIndex: startingNodeIndex,
-        );
+      // case aStar:
+      //   return AStar(
+      //     graph,
+      //     randomized: randomized,
+      //     startingNodeIndex: startingNodeIndex,
+      //   );
     }
   }
 
@@ -129,8 +129,8 @@ enum MazeSolvingAlgorithmType implements AlgorithmType {
         return AlgorithmMemoryType.stack;
       case bfs:
         return AlgorithmMemoryType.queue;
-      case aStar:
-        return AlgorithmMemoryType.openSet;
+      // case aStar:
+      //   return AlgorithmMemoryType.openSet;
     }
   }
 }

@@ -67,7 +67,7 @@ class ControlsButton extends StatelessWidget {
   const ControlsButton({
     super.key,
     this.size = 75,
-    this.color = Colors.black,
+    this.color = Colors.white,
     this.icon = Icons.add,
     this.label,
     this.onTap,
@@ -105,6 +105,7 @@ class ControlsButton extends StatelessWidget {
             : Icon(
                 icon,
                 size: iconSize,
+                color: Colors.black,
               ),
       ),
     );

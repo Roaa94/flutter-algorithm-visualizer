@@ -15,16 +15,15 @@ class MazeArtPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: MazeArtPageContent(
+      body: MazeArtDemo(
         size: MediaQuery.sizeOf(context),
       ),
     );
   }
 }
 
-
-class MazeArtPageContent extends StatefulWidget {
-  const MazeArtPageContent({
+class MazeArtDemo extends StatefulWidget {
+  const MazeArtDemo({
     super.key,
     required this.size,
   });
@@ -32,10 +31,10 @@ class MazeArtPageContent extends StatefulWidget {
   final Size size;
 
   @override
-  State<MazeArtPageContent> createState() => _MazeArtPageContentState();
+  State<MazeArtDemo> createState() => _MazeArtDemoState();
 }
 
-class _MazeArtPageContentState extends State<MazeArtPageContent>
+class _MazeArtDemoState extends State<MazeArtDemo>
     with SingleTickerProviderStateMixin {
   late final Ticker _ticker;
   Duration _elapsed = Duration.zero;
@@ -53,7 +52,7 @@ class _MazeArtPageContentState extends State<MazeArtPageContent>
     hasDiagonalEdges: false,
   );
 
-  static const cellSize = Size(50, 50);
+  static const cellSize = Size(15, 15);
 
   late Graph _mazeGraph;
   late GraphAlgorithm _algorithm;
@@ -106,7 +105,7 @@ class _MazeArtPageContentState extends State<MazeArtPageContent>
     super.initState();
     _ticker = createTicker(_onTick);
     _init();
-    _ticker.start();
+    if (mounted) _ticker.start();
   }
 
   void _onReset() {
@@ -115,7 +114,7 @@ class _MazeArtPageContentState extends State<MazeArtPageContent>
   }
 
   @override
-  void didUpdateWidget(covariant MazeArtPageContent oldWidget) {
+  void didUpdateWidget(covariant MazeArtDemo oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.size != oldWidget.size) {
       _onReset();
@@ -130,14 +129,12 @@ class _MazeArtPageContentState extends State<MazeArtPageContent>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SizedBox.expand(
-        child: CustomPaint(
-          painter: MazeArtPainter(
-            graph: _mazeGraph,
-            cellSize: cellSize.width,
-            dfs: _algorithm as DFS,
-          ),
+    return SizedBox.expand(
+      child: CustomPaint(
+        painter: MazeArtPainter(
+          graph: _mazeGraph,
+          cellSize: cellSize.width,
+          dfs: _algorithm as DFS,
         ),
       ),
     );

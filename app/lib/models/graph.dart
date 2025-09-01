@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 import './node.dart';
 
 enum GraphMode {
-  free('Free'),
+  // free('Free'),
   grid('Grid'),
   circle('Circle');
 

@@ -1,8 +1,8 @@
 import 'package:app/models/algorithms.dart';
 import 'package:flutter/material.dart';
 
-class MemoryView extends StatelessWidget {
-  const MemoryView({
+class DemoMemoryView extends StatelessWidget {
+  const DemoMemoryView({
     super.key,
     required this.algorithm,
     required this.selectedAlgorithmType,
@@ -57,14 +57,16 @@ class LabelItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(2.0),
       decoration: BoxDecoration(
+        color: Colors.white,
         border: Border.all(
-          color: Colors.white.withAlpha(50),
+          color: Colors.black,
         ),
+        borderRadius: BorderRadius.circular(5)
       ),
       child: Center(
         child: Text(
           text,
-          style: TextStyle(fontSize: 12),
+          style: TextStyle(fontSize: 20, color: Colors.black),
         ),
       ),
     );

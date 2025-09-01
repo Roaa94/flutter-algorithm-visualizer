@@ -29,8 +29,10 @@ class _GraphPlaygroundState extends State<GraphPlayground>
   GraphTraversalAlgorithmType _selectedAlgorithmType =
       GraphTraversalAlgorithmType.dfs;
   double _cellSizeFraction = 0.25;
+  int nodesPerCol = 5;
+  int nodesPerRow = 5;
   int _nodesCount = 10;
-  double _nodesRadius = 20;
+  double _nodesRadius = 30;
 
   late GraphAlgorithm _algorithm;
 
@@ -42,7 +44,10 @@ class _GraphPlaygroundState extends State<GraphPlayground>
   Duration _elapsed = Duration.zero;
   Duration? _lastElapsed;
 
-  Size get cellSize => widget.size * _cellSizeFraction;
+  Size get cellSize => Size(
+    widget.size.width / nodesPerCol,
+    widget.size.height / nodesPerRow,
+  );
 
   GraphBuilder get graphBuilder => GraphBuilder(
     mode: _mode,
@@ -82,7 +87,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
   void _tick() {
     final isCompleted = _algorithm.traverseStep();
     if (isCompleted) {
-      _paintEdges = false;
+      // _paintEdges = false;
     }
     setState(() {});
   }
