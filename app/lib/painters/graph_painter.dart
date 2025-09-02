@@ -114,12 +114,4 @@ class GraphPainter extends CustomPainter {
   bool shouldRepaint(covariant GraphPainter oldDelegate) {
     return true;
   }
-
-  @override
-  bool? hitTest(Offset position) {
-    // Todo: consider
-    // bool hit = path.contains(position);
-    // return hit;
-    return true;
-  }
 }
