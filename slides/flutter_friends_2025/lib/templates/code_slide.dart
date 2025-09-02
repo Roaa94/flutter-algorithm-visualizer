@@ -9,7 +9,7 @@ class CodeSlide extends FlutterDeckSlideWidget {
     super.key,
     this.subtitle,
     required this.title,
-    this.codeFontSize = 27,
+    this.codeFontSize = 22,
     this.showHeader = true,
     this.route,
   }) : super(
