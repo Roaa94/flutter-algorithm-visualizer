@@ -40,7 +40,7 @@ class _BFSDemoState extends State<BFSDemo> {
                         constraints.biggest.width - 100,
                         constraints.biggest.height - 70,
                       ),
-                      algorithmType: GraphTraversalAlgorithmType.bfs,
+                      algorithmType: AlgorithmType.bfs,
                       playTrigger: playTrigger,
                       nodesPerCol: 5,
                       nodesPerRow: 5,

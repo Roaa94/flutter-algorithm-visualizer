@@ -37,7 +37,7 @@ class MazeSolvingArtPageContent extends StatefulWidget {
 class _MazeSolvingArtPageContentState extends State<MazeSolvingArtPageContent>
     with SingleTickerProviderStateMixin {
   final int _desiredFrameRate = 60;
-  final _selectedAlgorithmType = MazeSolvingAlgorithmType.bfs;
+  final _selectedAlgorithmType = AlgorithmType.bfs;
   late GraphAlgorithm _algorithm;
   List<int>? _mazeSolutionPath;
 

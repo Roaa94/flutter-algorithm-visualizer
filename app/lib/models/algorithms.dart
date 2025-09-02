@@ -1,40 +1,35 @@
+import 'package:app/models/a_star.dart';
 import 'package:app/models/bfs.dart';
 import 'package:app/models/dfs.dart';
 
 import '../utils.dart';
 import 'graph.dart';
 
-abstract class AlgorithmType {
+enum AlgorithmType {
+  dfs('DFS'),
+  bfs('BFS'),
+  aStar('A*');
+
   const AlgorithmType(this.label);
 
   final String label;
 
-  GraphAlgorithm getAlgorithm(Graph graph, {bool randomized = true});
+  List<AlgorithmType> get graphTraversal => [
+    dfs,
+    bfs,
+    aStar,
+  ];
 
-  AlgorithmMemoryType get memory;
-}
+  List<AlgorithmType> get mazeGeneration => [
+    dfs,
+  ];
 
-enum AlgorithmMemoryType {
-  stack('Stack'),
-  queue('Queue'),
-  openSet('Open Set');
+  List<AlgorithmType> get mazeSolving => [
+    dfs,
+    bfs,
+    aStar,
+  ];
 
-  const AlgorithmMemoryType(this.label);
-
-  final String label;
-}
-
-enum GraphTraversalAlgorithmType implements AlgorithmType {
-  dfs('DFS'),
-  bfs('BFS');
-  // aStar('A*');
-
-  const GraphTraversalAlgorithmType(this.label);
-
-  @override
-  final String label;
-
-  @override
   GraphAlgorithm getAlgorithm(
     Graph graph, {
     bool randomized = true,
@@ -53,98 +48,31 @@ enum GraphTraversalAlgorithmType implements AlgorithmType {
           randomized: false,
           startingNodeIndex: startingNodeIndex,
         );
-      // case aStar:
-      //   return AStar(graph);
+      case aStar:
+        return AStar(graph);
     }
   }
 
-  @override
   AlgorithmMemoryType get memory {
     switch (this) {
       case dfs:
         return AlgorithmMemoryType.stack;
       case bfs:
         return AlgorithmMemoryType.queue;
-      // case aStar:
-      //   return AlgorithmMemoryType.openSet;
+      case aStar:
+        return AlgorithmMemoryType.openSet;
     }
   }
 }
 
-enum MazeGenerationAlgorithmType implements AlgorithmType {
-  dfs('DFS');
+enum AlgorithmMemoryType {
+  stack('Stack'),
+  queue('Queue'),
+  openSet('Open Set');
 
-  const MazeGenerationAlgorithmType(this.label);
+  const AlgorithmMemoryType(this.label);
 
-  @override
   final String label;
-
-  @override
-  GraphAlgorithm getAlgorithm(Graph graph, {bool randomized = true}) {
-    switch (this) {
-      case dfs:
-        return DFS(graph, randomized: randomized);
-    }
-  }
-
-  @override
-  AlgorithmMemoryType get memory {
-    switch (this) {
-      case dfs:
-        return AlgorithmMemoryType.stack;
-    }
-  }
-}
-
-enum MazeSolvingAlgorithmType implements AlgorithmType {
-  dfs('DFS'),
-  bfs('BFS');
-  // aStar('A*');
-
-  const MazeSolvingAlgorithmType(this.label);
-
-  @override
-  final String label;
-
-  @override
-  GraphAlgorithm getAlgorithm(
-    Graph graph, {
-    bool randomized = false,
-    int? startingNodeIndex,
-  }) {
-    switch (this) {
-      case dfs:
-        return DFS(
-          graph,
-          randomized: randomized,
-          startingNodeIndex: startingNodeIndex,
-        );
-      case bfs:
-        return BFS(
-          graph,
-          randomized: randomized,
-          startingNodeIndex: startingNodeIndex,
-        );
-      // case aStar:
-      //   return AStar(
-      //     graph,
-      //     randomized: randomized,
-      //     startingNodeIndex: startingNodeIndex,
-      //   );
-    }
-  }
-
-  @override
-  AlgorithmMemoryType get memory {
-    switch (this) {
-      case dfs:
-        return AlgorithmMemoryType.stack;
-      case bfs:
-        return AlgorithmMemoryType.queue;
-      // case aStar:
-      //   return AlgorithmMemoryType.openSet;
-    }
-  }
 }
 
 abstract class GraphAlgorithm {

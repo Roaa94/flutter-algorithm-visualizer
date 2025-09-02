@@ -14,7 +14,7 @@ class GraphTraversalDemo extends StatefulWidget {
     required this.size,
     this.hasControls = false,
     this.mode = GraphMode.grid,
-    this.algorithmType = GraphTraversalAlgorithmType.dfs,
+    this.algorithmType = AlgorithmType.dfs,
     this.playTrigger = false,
     this.resetTrigger = false,
     this.startingNodeIndex,
@@ -36,7 +36,7 @@ class GraphTraversalDemo extends StatefulWidget {
   final Size size;
   final bool hasControls;
   final GraphMode mode;
-  final GraphTraversalAlgorithmType algorithmType;
+  final AlgorithmType algorithmType;
   final int? startingNodeIndex;
   final int frameRate;
   final int nodesPerRow;
@@ -60,7 +60,7 @@ class GraphTraversalDemo extends StatefulWidget {
 class _GraphTraversalDemoState extends State<GraphTraversalDemo>
     with SingleTickerProviderStateMixin {
   late int _desiredFrameRate;
-  late GraphTraversalAlgorithmType _selectedAlgorithmType;
+  late AlgorithmType _selectedAlgorithmType;
   final _nodesCount = 10;
 
   late GraphAlgorithm _algorithm;

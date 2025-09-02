@@ -17,7 +17,7 @@ class MazeSolvingDemo extends StatefulWidget {
     this.nextTrigger = false,
     this.frameRate = 60,
     this.nodesPerCol = 10,
-    this.selectedAlgorithmType = MazeSolvingAlgorithmType.bfs,
+    this.selectedAlgorithmType = AlgorithmType.bfs,
     this.mazeView = true,
     super.key,
   });
@@ -28,7 +28,7 @@ class MazeSolvingDemo extends StatefulWidget {
   final bool nextTrigger;
   final int frameRate;
   final int nodesPerCol;
-  final MazeSolvingAlgorithmType selectedAlgorithmType;
+  final AlgorithmType selectedAlgorithmType;
   final bool mazeView;
 
   @override

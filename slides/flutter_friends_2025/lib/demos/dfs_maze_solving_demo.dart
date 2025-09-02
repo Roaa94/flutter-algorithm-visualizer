@@ -39,7 +39,7 @@ class _DFSMazeSolvingDemoState extends State<DFSMazeSolvingDemo> {
                         constraints.biggest.width,
                         constraints.biggest.height - 60,
                       ),
-                      selectedAlgorithmType: MazeSolvingAlgorithmType.dfs,
+                      selectedAlgorithmType: AlgorithmType.dfs,
                       playTrigger: playTrigger,
                       nodesPerCol: Constants.mazeCellColCount,
                       frameRate: 60,

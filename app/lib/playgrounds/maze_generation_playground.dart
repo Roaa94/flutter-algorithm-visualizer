@@ -25,7 +25,7 @@ class MazeGenerationPlayground extends StatefulWidget {
 class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
     with SingleTickerProviderStateMixin {
   int _desiredFrameRate = 20;
-  MazeGenerationAlgorithmType _selectedAlgorithm = MazeGenerationAlgorithmType.dfs;
+  AlgorithmType _selectedAlgorithm = AlgorithmType.dfs;
   late GraphAlgorithm _algorithm;
 
   double _cellSizeFraction = 0.08;
@@ -120,7 +120,7 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
     });
   }
 
-  void _onAlgorithmChanged(MazeGenerationAlgorithmType algorithm) {
+  void _onAlgorithmChanged(AlgorithmType algorithm) {
     setState(() {
       _selectedAlgorithm = algorithm;
     });
@@ -228,9 +228,9 @@ class _MazeGenerationPlaygroundState extends State<MazeGenerationPlayground>
               Flexible(
                 child: SizedBox(
                   width: 250,
-                  child: CustomRadioGroup<MazeGenerationAlgorithmType>(
+                  child: CustomRadioGroup<AlgorithmType>(
                     selectedItem: _selectedAlgorithm,
-                    items: MazeGenerationAlgorithmType.values,
+                    items: AlgorithmType.values,
                     onChanged: _onAlgorithmChanged,
                     labelBuilder: (m) => m.label,
                   ),

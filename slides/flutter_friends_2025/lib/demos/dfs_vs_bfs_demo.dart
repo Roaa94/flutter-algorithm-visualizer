@@ -52,7 +52,7 @@ class DFSvsBFSDemo extends StatelessWidget {
                     builder: (context, constraints) {
                       return GraphTraversalDemo(
                         size: constraints.biggest,
-                        algorithmType: GraphTraversalAlgorithmType.bfs,
+                        algorithmType: AlgorithmType.bfs,
                         nodesPerCol: nodesPerCol,
                         nodesPerRow: nodesPerCol,
                         frameRate: fps,

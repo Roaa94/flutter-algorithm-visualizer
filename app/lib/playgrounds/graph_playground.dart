@@ -26,8 +26,8 @@ class GraphPlayground extends StatefulWidget {
 class _GraphPlaygroundState extends State<GraphPlayground>
     with SingleTickerProviderStateMixin {
   int _desiredFrameRate = 1;
-  GraphTraversalAlgorithmType _selectedAlgorithmType =
-      GraphTraversalAlgorithmType.dfs;
+  AlgorithmType _selectedAlgorithmType =
+      AlgorithmType.dfs;
   double _cellSizeFraction = 0.25;
   int nodesPerCol = 5;
   int nodesPerRow = 5;
@@ -149,7 +149,7 @@ class _GraphPlaygroundState extends State<GraphPlayground>
     _onReset();
   }
 
-  void _onAlgorithmChanged(GraphTraversalAlgorithmType algorithm) {
+  void _onAlgorithmChanged(AlgorithmType algorithm) {
     setState(() {
       _selectedAlgorithmType = algorithm;
     });
@@ -352,9 +352,9 @@ class _GraphPlaygroundState extends State<GraphPlayground>
               Flexible(
                 child: SizedBox(
                   width: 250,
-                  child: CustomRadioGroup<GraphTraversalAlgorithmType>(
+                  child: CustomRadioGroup<AlgorithmType>(
                     selectedItem: _selectedAlgorithmType,
-                    items: GraphTraversalAlgorithmType.values,
+                    items: AlgorithmType.values,
                     onChanged: _onAlgorithmChanged,
                     labelBuilder: (m) => m.label,
                   ),

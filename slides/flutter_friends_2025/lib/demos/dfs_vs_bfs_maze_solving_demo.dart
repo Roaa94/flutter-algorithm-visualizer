@@ -9,9 +9,6 @@ class DFSvsBFSMazeSolvingDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const fps = 4;
-    const startingNodeIndex = 12;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 100.0, vertical: 40),
       child: Row(
@@ -28,7 +25,7 @@ class DFSvsBFSMazeSolvingDemo extends StatelessWidget {
                     builder: (context, constraints) {
                       return MazeSolvingDemo(
                         size: constraints.biggest,
-                        selectedAlgorithmType: MazeSolvingAlgorithmType.dfs,
+                        selectedAlgorithmType: AlgorithmType.dfs,
                         nodesPerCol: Constants.mazeCellColCount,
                         frameRate: 60,
                         playTrigger: true,
@@ -50,7 +47,7 @@ class DFSvsBFSMazeSolvingDemo extends StatelessWidget {
                     builder: (context, constraints) {
                       return MazeSolvingDemo(
                         size: constraints.biggest,
-                        selectedAlgorithmType: MazeSolvingAlgorithmType.bfs,
+                        selectedAlgorithmType: AlgorithmType.bfs,
                         nodesPerCol: Constants.mazeCellColCount,
                         frameRate: 60,
                         playTrigger: true,

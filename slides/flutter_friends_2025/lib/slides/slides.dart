@@ -151,6 +151,9 @@ final slides = [
     title: 'Flutter Simulation - Ticker Setup',
     route: 'flutter-simulation-ticker-2',
   ),
+  SectionTitleSlide(
+    'DFS Application',
+  ),
   DFSGridDemoSlide(),
   DFSMazeDemoSlide(),
   SectionTitleSlide(
